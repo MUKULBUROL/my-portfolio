@@ -1,35 +1,39 @@
 import { Hero } from '@/components/sections/Hero'
-import { About } from '@/components/sections/About'
-import { Projects } from '@/components/sections/Projects'
-import { SystemDesign } from '@/components/sections/SystemDesign'
-import { Journey } from '@/components/sections/Journey'
-import { ContactHub } from '@/components/sections/ContactHub'
+import { Pause } from '@/components/sections/Pause'
+import { MyJourney } from '@/components/sections/MyJourney'
+import { HowIThink } from '@/components/sections/HowIThink'
+import { SelectedWork } from '@/components/sections/SelectedWork'
+import { WhatImBuildingNext } from '@/components/sections/WhatImBuildingNext'
+import { Connect } from '@/components/sections/Connect'
 
 export default function HomePage() {
   return (
     <>
       <Hero />
 
-      {/* Section divider */}
       <div className="section-divider mx-auto max-w-5xl" aria-hidden="true" />
 
-      <About />
-
-      <div className="section-divider mx-auto max-w-5xl" aria-hidden="true" />
-
-      <Projects />
+      <Pause />
 
       <div className="section-divider mx-auto max-w-5xl" aria-hidden="true" />
 
-      <SystemDesign />
+      <MyJourney />
 
       <div className="section-divider mx-auto max-w-5xl" aria-hidden="true" />
 
-      <Journey />
+      <HowIThink />
 
       <div className="section-divider mx-auto max-w-5xl" aria-hidden="true" />
 
-      <ContactHub />
+      <SelectedWork />
+
+      <div className="section-divider mx-auto max-w-5xl" aria-hidden="true" />
+
+      <WhatImBuildingNext />
+
+      <div className="section-divider mx-auto max-w-5xl" aria-hidden="true" />
+
+      <Connect />
     </>
   )
 }

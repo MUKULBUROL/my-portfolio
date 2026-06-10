@@ -6,11 +6,11 @@ import { cn } from '@/lib/utils'
 import { profile } from '@/data/profile'
 
 const navItems = [
-  { label: 'About', href: '#about', id: 'about' },
-  { label: 'Projects', href: '#projects', id: 'projects' },
-  { label: 'How I Think', href: '#thinking', id: 'thinking' },
-  { label: 'Experience', href: '#journey', id: 'journey' },
-  { label: 'Contact', href: '#contact', id: 'contact' },
+  { label: 'Selected Work', href: '#selected-work', id: 'selected-work' },
+  { label: 'How I Think', href: '#how-i-think', id: 'how-i-think' },
+  { label: 'My Journey', href: '#my-journey', id: 'my-journey' },
+  { label: 'What I\'m Building Next', href: '#next-building', id: 'next-building' },
+  { label: 'Connect', href: '#connect', id: 'connect' },
 ]
 
 export function NavBar() {
@@ -108,7 +108,7 @@ export function NavBar() {
           {/* CTA + Mobile Toggle */}
           <div className="flex items-center gap-2">
             <button
-              onClick={() => scrollTo('contact')}
+              onClick={() => scrollTo('connect')}
               className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 border border-[#111111]/10 hover:border-[#111111]/20 bg-[#111111]/5 hover:bg-[#111111]/10 text-[#111111] rounded-lg text-xs font-mono font-medium transition-all duration-200"
             >
               <span className="status-dot w-1.5 h-1.5 inline-block bg-[#10B981]" />
@@ -156,7 +156,7 @@ export function NavBar() {
             ))}
             <li>
               <button
-                onClick={() => scrollTo('contact')}
+                onClick={() => scrollTo('connect')}
                 className="w-full mt-2 py-3 bg-[#111111] text-[#f5efe8] hover:bg-[#222222] rounded-xl text-sm font-semibold transition-colors duration-200"
               >
                 Get In Touch

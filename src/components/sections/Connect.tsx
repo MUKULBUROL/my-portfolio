@@ -26,13 +26,13 @@ const ICON_MAP: Record<string, React.ReactNode> = {
 }
 
 const AVAILABLE_FOR = [
-  'Full-Time Engineering Roles',
-  'Freelance / Contract Projects',
-  'Technical Collaboration',
-  'Open Source Contributions',
+  'Enterprise Distributed Systems Roles',
+  'AI Integration Consulting',
+  'Open Source Software Design',
+  'Full-Stack System Architectures'
 ]
 
-export function ContactHub() {
+export function Connect() {
   const [copied, setCopied] = useState(false)
   const [downloading, setDownloading] = useState(false)
   const headerRef = useRef<HTMLDivElement>(null)
@@ -49,7 +49,6 @@ export function ContactHub() {
       setCopied(true)
       setTimeout(() => setCopied(false), 2500)
     } catch {
-      // Fallback for browsers without clipboard API
       const ta = document.createElement('textarea')
       ta.value = emailAddress
       document.body.appendChild(ta)
@@ -73,21 +72,21 @@ export function ContactHub() {
   }
 
   return (
-    <section id="contact" className="py-24 relative overflow-hidden bg-[#f5efe8]">
+    <section id="connect" className="py-24 relative overflow-hidden bg-[#f5efe8]">
       <div className="max-w-5xl mx-auto px-6 relative z-10">
         <div ref={headerRef} className="text-center">
           <SectionHeader
-            eyebrow="Contact Hub"
-            eyebrowNumber="04"
-            title="Let's Build Something"
-            subtitle={`I'm ${profile.availabilityLabel.toLowerCase()} and actively looking for roles where I can solve hard problems at the intersection of AI and product engineering.`}
+            eyebrow="Connect"
+            eyebrowNumber="06"
+            title="Let's Start a Conversation"
+            subtitle={`I'm currently ${profile.availabilityLabel.toLowerCase()} and seeking teams that value engineering discipline, performance, and narrative clarity.`}
             align="center"
           />
         </div>
 
         <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
           {/* Status card */}
-          <GlassCard className="md:col-span-1 p-6 border-[#111111]/8 flex flex-col gap-5" glowColor="none" hoverEffect>
+          <GlassCard className="md:col-span-1 p-6 border-[#111111]/8 flex flex-col justify-between" glowColor="none" hoverEffect>
             <div className="flex items-center gap-3">
               <div className="status-dot bg-[#10B981]" />
               <div>
@@ -96,8 +95,8 @@ export function ContactHub() {
               </div>
             </div>
 
-            <div>
-              <div className="text-[9px] font-mono text-[#6b6b6b] uppercase tracking-widest mb-3">Available For</div>
+            <div className="my-6">
+              <div className="text-[9px] font-mono text-[#6b6b6b] uppercase tracking-widest mb-3">Interests</div>
               <ul className="flex flex-col gap-2" aria-label="Available for">
                 {AVAILABLE_FOR.map((item) => (
                   <li key={item} className="flex items-center gap-2 text-xs text-[#6b6b6b]">
@@ -108,8 +107,8 @@ export function ContactHub() {
               </ul>
             </div>
 
-            <div className="pt-2 border-t border-[#111111]/8">
-              <div className="text-[9px] font-mono text-[#6b6b6b] mb-1">Location</div>
+            <div className="pt-4 border-t border-[#111111]/8">
+              <div className="text-[9px] font-mono text-[#6b6b6b] mb-1">Details</div>
               <div className="text-xs text-[#111111] font-mono">{profile.location}</div>
               <div className="text-[9px] text-[#6b6b6b] font-mono mt-0.5">{profile.timezone}</div>
             </div>
@@ -117,7 +116,7 @@ export function ContactHub() {
 
           {/* Social links */}
           <GlassCard className="md:col-span-2 p-6 border-[#111111]/8 flex flex-col gap-5" glowColor="none" hoverEffect={false}>
-            <div className="text-[9px] font-mono text-[#6b6b6b] uppercase tracking-widest">Connect</div>
+            <div className="text-[9px] font-mono text-[#6b6b6b] uppercase tracking-widest">Connect Pathways</div>
 
             <div className="flex flex-col gap-3">
               {socials.map((social) => (
@@ -185,7 +184,7 @@ export function ContactHub() {
 
         {/* Footer */}
         <div className="mt-20 pt-8 border-t border-[#111111]/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] font-mono text-[#6b6b6b]">
-          <span>© {new Date().getFullYear()} {profile.name}. Built with Next.js 15.</span>
+          <span>© {new Date().getFullYear()} {profile.name}. Narrative engineering story.</span>
           <span>Designed &amp; developed with care.</span>
         </div>
       </div>
