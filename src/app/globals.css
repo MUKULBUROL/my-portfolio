@@ -1,0 +1,171 @@
+@import "tailwindcss";
+
+/* ============================================================
+   CREATIVE STUDIO EDITORIAL — Design Tokens
+   Warm beige and charcoal typography-first system
+   ============================================================ */
+
+@theme {
+  /* Colors */
+  --color-bg: #f5efe8;
+  --color-bg-surface: #fcfaf7;
+  --color-bg-elevated: #ffffff;
+  --color-primary: #111111; /* Charcoal/Accent primary */
+  --color-primary-glow: rgba(17, 17, 17, 0.04);
+  --color-accent: #111111;
+  --color-accent-glow: rgba(17, 17, 17, 0.04);
+  --color-text: #111111;
+  --color-muted: #6b6b6b;
+  --color-border: rgba(17, 17, 17, 0.08);
+  --color-border-strong: rgba(17, 17, 17, 0.15);
+
+  /* Fonts */
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-heading: var(--font-outfit), system-ui, sans-serif;
+  --font-mono: var(--font-fira-code), 'Courier New', monospace;
+
+  /* Spacing */
+  --spacing: 4px;
+
+  /* Radii */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* Transitions */
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+/* ============================================================
+   Base Styles
+   ============================================================ */
+
+:root {
+  color-scheme: light;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  background-color: #f5efe8;
+  scroll-behavior: auto; /* Lenis handles smooth scrolling */
+}
+
+body {
+  background-color: #f5efe8;
+  color: #111111;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================
+   Lenis Smooth Scroll
+   ============================================================ */
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+/* ============================================================
+   Scrollbar
+   ============================================================ */
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f5efe8; }
+::-webkit-scrollbar-thumb {
+  background: rgba(17, 17, 17, 0.15);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(17, 17, 17, 0.3);
+}
+
+/* ============================================================
+   Focus Styles
+   ============================================================ */
+
+:focus-visible {
+  outline: 2px solid #111111;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ============================================================
+   Utility Classes
+   ============================================================ */
+
+/* Sleek light glassmorphism for floating controls only */
+.glass {
+  background: rgba(252, 250, 247, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(17, 17, 17, 0.08);
+}
+
+/* Section separator */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(17, 17, 17, 0.08), transparent);
+}
+
+/* Horizontal projects slider classes */
+.film-reel-container {
+  display: flex;
+  flex-wrap: nowrap;
+  will-change: transform;
+}
+
+.film-exhibit {
+  flex: 0 0 auto;
+  width: 80vw;
+  max-width: 900px;
+  padding: 0 40px;
+}
+
+/* Noise overlay for organic paper texture */
+.noise::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Skip to content (a11y) */
+.skip-to-content {
+  position: absolute;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111111;
+  color: #f5efe8;
+  padding: 8px 20px;
+  border-radius: 0 0 8px 8px;
+  font-weight: 600;
+  z-index: 9999;
+  transition: top 0.2s;
+}
+
+.skip-to-content:focus {
+  top: 0;
+}
+
+/* Status indicator dot */
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10B981;
+}

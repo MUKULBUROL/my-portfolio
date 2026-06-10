@@ -1,0 +1,66 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Project {
+  id           String   @id @default(uuid())
+  title        String
+  description  String
+  problem      String   @db.Text
+  architecture String   @db.Text
+  techStack    String[] // Array of strings (supported natively in PostgreSQL)
+  challenges   String   @db.Text
+  results      String   @db.Text
+  metrics      String?  // e.g., "95% score, 2.5s load reduction"
+  githubUrl    String?
+  liveUrl      String?
+  imageUrl     String?  // Showcase image
+  featured     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([featured])
+}
+
+model BlogPost {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  summary     String   @db.Text
+  content     String   @db.Text // MDX raw text
+  tags        String[] // Array of tags
+  published   Boolean  @default(false)
+  views       Int      @default(0)
+  readingTime Int      @default(5)
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published])
+  @@index([slug])
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  company   String?
+  message   String   @db.Text
+  ipHash    String?  // For spam auditing and client rate limiting
+  status    String   @default("UNREAD") // UNREAD, READ, ARCHIVED
+  createdAt DateTime @default(now())
+}
