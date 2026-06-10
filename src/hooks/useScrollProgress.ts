@@ -2,6 +2,20 @@
 
 import { useEffect, useState } from 'react'
 
+/**
+ * Section IDs in DOM order (matching page.tsx layout).
+ * Update this array whenever section order changes in page.tsx.
+ */
+const SECTION_IDS = [
+  'hero',
+  'selected-work',
+  'pause',
+  'how-i-think',
+  'my-journey',
+  'next-building',
+  'connect',
+]
+
 export function useScrollProgress() {
   const [progress, setProgress] = useState(0)
   const [activeSection, setActiveSection] = useState<string>('hero')
@@ -12,9 +26,9 @@ export function useScrollProgress() {
       const scrolled = window.scrollY
       setProgress(totalHeight > 0 ? scrolled / totalHeight : 0)
 
-      // Detect active section via IntersectionObserver logic
-      const sectionIds = ['hero', 'about', 'projects', 'skills', 'thinking', 'journey', 'contact']
-      for (const id of [...sectionIds].reverse()) {
+      // Walk sections from bottom to top; first one whose top edge is above
+      // 40% viewport height is considered "active".
+      for (const id of [...SECTION_IDS].reverse()) {
         const el = document.getElementById(id)
         if (el) {
           const rect = el.getBoundingClientRect()

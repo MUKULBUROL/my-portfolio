@@ -44,19 +44,19 @@ export function Connect() {
   }, [])
 
   const handleCopyEmail = async () => {
+    // Use modern Clipboard API only (execCommand is deprecated)
+    if (!navigator.clipboard) {
+      // Clipboard API unavailable — show a friendly fallback
+      setCopied(false)
+      return
+    }
     try {
       await navigator.clipboard.writeText(emailAddress)
       setCopied(true)
       setTimeout(() => setCopied(false), 2500)
     } catch {
-      const ta = document.createElement('textarea')
-      ta.value = emailAddress
-      document.body.appendChild(ta)
-      ta.select()
-      document.execCommand('copy')
-      document.body.removeChild(ta)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2500)
+      // Permission denied or other error — silently degrade
+      setCopied(false)
     }
   }
 
@@ -154,6 +154,16 @@ export function Connect() {
 
         {/* Action buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          {/* Primary: direct mailto link for fastest recruiter response */}
+          <a
+            href={`mailto:${emailAddress}?subject=Let's%20Connect`}
+            className="flex items-center gap-3 px-7 py-4 bg-[#111111] hover:bg-[#222222] text-[#f5efe8] rounded-xl text-sm font-semibold transition-all duration-300"
+            aria-label={`Send email to ${emailAddress}`}
+          >
+            <Mail size={16} />
+            <span>Send Email</span>
+          </a>
+
           <MagneticButton
             onClick={handleCopyEmail}
             className={cn(
@@ -165,14 +175,14 @@ export function Connect() {
             aria-label={copied ? 'Email copied to clipboard' : 'Copy email address'}
           >
             {copied ? <Check size={16} /> : <Copy size={16} />}
-            <span>{copied ? 'Email Copied!' : `Copy Email`}</span>
+            <span>{copied ? 'Copied!' : 'Copy Email'}</span>
           </MagneticButton>
 
           <MagneticButton
             onClick={handleDownloadResume}
             disabled={downloading}
             className={cn(
-              'flex items-center gap-3 px-7 py-4 bg-[#111111] hover:bg-[#222222] text-[#f5efe8] rounded-xl text-sm font-semibold transition-all duration-300',
+              'flex items-center gap-3 px-7 py-4 rounded-xl text-sm font-semibold border border-[#111111]/10 hover:bg-[#111111]/5 text-[#111111] transition-all duration-300',
               downloading && 'opacity-70 cursor-wait'
             )}
             aria-label="Download resume PDF"

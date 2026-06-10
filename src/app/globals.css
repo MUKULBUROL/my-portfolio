@@ -169,3 +169,102 @@ html.lenis body {
   border-radius: 50%;
   background: #10B981;
 }
+
+/* ============================================================
+   EDITORIAL REDESIGN & FILM REEL ADDITIONS
+   ============================================================ */
+
+/* Floating Editorial Navbar Underline Animation */
+.nav-link {
+  position: relative;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0;
+  height: 1.5px;
+  background-color: #111111;
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.nav-dot {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #111111;
+}
+
+/* Film Grain Overlay (Subtle randomized animation overlay) */
+@keyframes grainAnimation {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-1%, -1%); }
+  20% { transform: translate(-2%, 1%); }
+  30% { transform: translate(1%, -2%); }
+  40% { transform: translate(-1%, 3%); }
+  50% { transform: translate(-2%, 1%); }
+  60% { transform: translate(3%, -1%); }
+  70% { transform: translate(2%, 1%); }
+  80% { transform: translate(-1%, -1%); }
+  90% { transform: translate(1%, 3%); }
+}
+
+.film-grain-overlay {
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  right: -50%;
+  bottom: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' /%3E%3C/svg%3E");
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 9999;
+  animation: grainAnimation 8s steps(10) infinite;
+}
+
+/* Film strip sprockets tracks */
+.film-sprocket-track-top {
+  position: absolute;
+  top: 4vh;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='20' viewBox='0 0 32 20'%3E%3Crect x='8' y='3' width='16' height='14' rx='3' fill='%23111111' fill-opacity='0.035'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  pointer-events: none;
+}
+
+.film-sprocket-track-bottom {
+  position: absolute;
+  bottom: 4vh;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='20' viewBox='0 0 32 20'%3E%3Crect x='8' y='3' width='16' height='14' rx='3' fill='%23111111' fill-opacity='0.035'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  pointer-events: none;
+}
+
+/* ============================================================
+   MARCHING ANTS DATA FLOW ANIMATION (HowIThink section)
+   Moved from styled-jsx (invalid in App Router) to global CSS
+   ============================================================ */
+
+@keyframes marching-flow {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -800;
+  }
+}

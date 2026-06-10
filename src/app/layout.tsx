@@ -117,6 +117,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#f5efe8" />
       </head>
       <body className="min-h-full bg-[#f5efe8] text-[#111111] overflow-x-hidden">
+        <div className="film-grain-overlay" aria-hidden="true" />
         <Providers>
           <NavBar />
           <main id="main-content">{children}</main>

@@ -47,8 +47,10 @@ export function HowIThink() {
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger)
 
+    const triggers: ScrollTrigger[] = []
+
     // Fade in section header
-    gsap.fromTo(
+    const headerAnim = gsap.fromTo(
       headerRef.current,
       { y: 30, opacity: 0 },
       {
@@ -63,11 +65,12 @@ export function HowIThink() {
         },
       }
     )
+    if (headerAnim.scrollTrigger) triggers.push(headerAnim.scrollTrigger)
 
     // Trigger line drawing on scroll
     const path = svgRef.current?.querySelector('.animated-flow-path')
     if (path) {
-      gsap.fromTo(
+      const pathAnim = gsap.fromTo(
         path,
         { strokeDashoffset: 800 },
         {
@@ -81,6 +84,11 @@ export function HowIThink() {
           }
         }
       )
+      if (pathAnim.scrollTrigger) triggers.push(pathAnim.scrollTrigger)
+    }
+
+    return () => {
+      triggers.forEach((t) => t.kill())
     }
   }, [])
 
@@ -188,17 +196,6 @@ export function HowIThink() {
 
       </div>
 
-      {/* Marching ants style keyframes */}
-      <style jsx global>{`
-        @keyframes marching-flow {
-          0% {
-            stroke-dashoffset: 0;
-          }
-          100% {
-            stroke-dashoffset: -800;
-          }
-        }
-      `}</style>
     </section>
   )
 }

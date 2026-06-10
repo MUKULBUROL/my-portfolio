@@ -33,7 +33,9 @@ export function WhatImBuildingNext() {
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger)
 
-    gsap.fromTo(
+    const triggers: ScrollTrigger[] = []
+
+    const headerAnim = gsap.fromTo(
       headerRef.current,
       { y: 30, opacity: 0 },
       {
@@ -48,25 +50,31 @@ export function WhatImBuildingNext() {
         },
       }
     )
+    if (headerAnim.scrollTrigger) triggers.push(headerAnim.scrollTrigger)
 
     const items = containerRef.current?.querySelectorAll('.ledger-item')
     items?.forEach((item) => {
-      gsap.fromTo(
+      const anim = gsap.fromTo(
         item,
-        { opacity: 0, y: 25 },
+        { clipPath: 'polygon(0 0, 0 0, 0 100%, 0 100%)', opacity: 0.5 },
         {
+          clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
           opacity: 1,
-          y: 0,
-          duration: 0.7,
-          ease: 'power3.out',
+          duration: 1.0,
+          ease: 'power2.out',
           scrollTrigger: {
             trigger: item,
-            start: 'top 85%',
+            start: 'top 88%',
             once: true,
           },
         }
       )
+      if (anim.scrollTrigger) triggers.push(anim.scrollTrigger)
     })
+
+    return () => {
+      triggers.forEach((t) => t.kill())
+    }
   }, [])
 
   return (

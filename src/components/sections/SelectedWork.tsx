@@ -3,30 +3,31 @@
 import React, { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { SectionHeader } from '../ui/SectionHeader'
+import { ProjectMinimalVisual } from '../ui/ProjectMinimalVisual'
 import { projects } from '@/data/projects'
-import { ArrowRight, ArrowUpRight } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-// Select the three main projects for the narrative frames
 const DISPLAY_PROJECTS = projects.slice(0, 3)
 
 export function SelectedWork() {
   const sectionRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
+  const reelBgRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger)
 
-    // Fade in section header
+    // Cinematic clip-path reveal on the section header
     gsap.fromTo(
       headerRef.current,
-      { y: 30, opacity: 0 },
+      { clipPath: 'polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)', y: 30 },
       {
+        clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
         y: 0,
-        opacity: 1,
-        duration: 0.8,
+        duration: 1.0,
         ease: 'power3.out',
         scrollTrigger: {
           trigger: headerRef.current,
@@ -36,17 +37,21 @@ export function SelectedWork() {
       }
     )
 
-    // Horizontal Scroll Trigger
     const track = trackRef.current
     const section = sectionRef.current
+    const reelBg = reelBgRef.current
     if (!track || !section) return
+
+    // ── Mobile guard: vertical stack on small screens ──
+    // The horizontal pin only makes sense on wide viewports.
+    // On mobile (<768px) we skip GSAP entirely and let CSS flex-wrap handle layout.
+    if (window.innerWidth < 768) return
 
     const scrollWidth = track.scrollWidth
     const calculateTranslation = () => -(scrollWidth - window.innerWidth)
 
-    const scrollTween = gsap.to(track, {
-      x: calculateTranslation,
-      ease: 'none',
+    // Main horizontal pinning timeline
+    const tl = gsap.timeline({
       scrollTrigger: {
         trigger: section,
         pin: true,
@@ -54,12 +59,69 @@ export function SelectedWork() {
         start: 'top top',
         end: () => `+=${scrollWidth - window.innerWidth}`,
         invalidateOnRefresh: true,
-      },
+      }
+    })
+
+    // Slide track horizontally
+    tl.to(track, {
+      x: calculateTranslation,
+      ease: 'none',
+    }, 0)
+
+    // Parallax background movement (moves slower than slides)
+    if (reelBg) {
+      tl.to(reelBg, {
+        x: () => -(scrollWidth - window.innerWidth) * 0.3,
+        ease: 'none',
+      }, 0)
+    }
+
+    // Slide reveals: cinematic slide reveals per frame using containerAnimation
+    const frames = track.querySelectorAll('.film-frame')
+    frames.forEach((frame) => {
+      const visual = frame.querySelector('.project-visual')
+      const details = frame.querySelector('.project-details')
+      
+      if (visual) {
+        gsap.fromTo(visual,
+          { clipPath: 'polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)', opacity: 0.3, scale: 0.9 },
+          {
+            clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
+            opacity: 1,
+            scale: 1,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: frame,
+              containerAnimation: tl,
+              start: 'left 85%',
+              end: 'left 40%',
+              scrub: true,
+            }
+          }
+        )
+      }
+
+      if (details) {
+        gsap.fromTo(details,
+          { y: 40, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: frame,
+              containerAnimation: tl,
+              start: 'left 80%',
+              toggleActions: 'play none none reverse',
+            }
+          }
+        )
+      }
     })
 
     return () => {
-      scrollTween.scrollTrigger?.kill()
-      scrollTween.kill()
+      tl.scrollTrigger?.kill()
+      tl.kill()
     }
   }, [])
 
@@ -68,86 +130,100 @@ export function SelectedWork() {
       id="selected-work"
       ref={sectionRef}
       className="relative w-full h-screen overflow-hidden bg-[#f5efe8] flex flex-col justify-between"
+      aria-label="Selected projects horizontal section"
     >
+      {/* Movie Reel Background with Parallax */}
+      <div
+        ref={reelBgRef}
+        className="absolute inset-y-0 left-0 w-[200vw] h-full pointer-events-none z-0 overflow-hidden"
+        aria-hidden="true"
+      >
+        <div className="film-sprocket-track-top" />
+        <div className="film-sprocket-track-bottom" />
+      </div>
+
       {/* Top Header */}
-      <div ref={headerRef} className="max-w-7xl mx-auto px-6 w-full pt-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div ref={headerRef} className="max-w-7xl mx-auto px-8 sm:px-12 md:px-16 w-full pt-16 flex flex-col md:flex-row md:items-end justify-between gap-6 relative z-10 select-none">
         <SectionHeader
           eyebrow="Selected Work"
-          eyebrowNumber="04"
+          eyebrowNumber="01"
           title="Interactive Story of Work"
           subtitle="Explore the challenges, system decisions, and real-world outcomes of architectural systems."
           className="mb-0 text-[#111111]"
         />
         <div className="font-mono text-xs text-[#6b6b6b] hidden md:block">
-          Scroll vertically to traverse the timeline →
+          Scroll vertically to traverse the reel →
         </div>
       </div>
 
       {/* Horizontal Slides track */}
-      <div className="flex-grow flex items-center">
+      <div className="flex-grow flex items-center relative z-10">
         <div
           ref={trackRef}
-          className="film-reel-container flex flex-row items-center gap-16 px-16 w-max"
+          className="flex flex-row items-center gap-32 px-[15vw] w-max"
         >
-          {/* Frame 01: Project 1 */}
-          <div className="film-exhibit-wrapper">
-            <ProjectFrame project={DISPLAY_PROJECTS[0]} frameNum="01" />
-          </div>
+          {/* Project Frames */}
+          {DISPLAY_PROJECTS.map((project, idx) => (
+            <div
+              key={project.id}
+              className="film-frame w-[80vw] h-[65vh] flex flex-col md:flex-row items-center justify-between gap-8 md:gap-16 select-none flex-shrink-0"
+            >
+              {/* Project Visual */}
+              <div className="project-visual w-full md:w-1/2 h-full flex items-center justify-center p-4">
+                <ProjectMinimalVisual projectId={project.id} />
+              </div>
 
-          {/* Frame 02: Project 2 */}
-          <div className="film-exhibit-wrapper">
-            <ProjectFrame project={DISPLAY_PROJECTS[1]} frameNum="02" />
-          </div>
+              {/* Project Details */}
+              <div className="project-details w-full md:w-1/2 flex flex-col justify-center items-start text-[#111111] max-w-md">
+                <span className="font-mono text-[9px] text-[#6b6b6b] uppercase tracking-wider mb-2">
+                  Frame 0{idx + 1} / {project.status.toUpperCase()}
+                </span>
+                
+                <h3 className="text-3xl sm:text-4xl md:text-5xl font-heading font-black leading-none mb-4 select-text">
+                  {project.name}
+                </h3>
+                
+                <div className="mb-6">
+                  <span className="font-mono text-[9px] uppercase tracking-widest text-[#6b6b6b] block mb-1">Outcome</span>
+                  <p className="text-sm text-[#6b6b6b] leading-relaxed font-sans select-text">
+                    {project.results || project.solution}
+                  </p>
+                </div>
+                
+                <div>
+                  <span className="font-mono text-[9px] uppercase tracking-widest text-[#6b6b6b] block mb-1">Role</span>
+                  <p className="text-xs font-mono text-[#111111] font-semibold select-text">
+                    {project.status === 'open-source' ? 'Creator / Author' : 'Lead Architect'}
+                  </p>
+                </div>
 
-          {/* Frame 03: Architecture Insight */}
-          <div className="film-exhibit w-[80vw] sm:w-[70vw] md:w-[60vw] max-w-[850px] aspect-[16/10.5] sm:aspect-[16/10] bg-[#111111] text-[#f5efe8] border border-[#111111]/10 rounded-2xl p-8 sm:p-12 flex flex-col justify-between select-none">
-            <span className="font-mono text-[9px] text-[#f5efe8]/60 uppercase tracking-[0.2em]">Frame 03 / Architecture Insight</span>
-            <div className="my-auto">
-              <blockquote className="text-2xl sm:text-3xl font-heading font-black tracking-tight leading-tight mb-4">
-                "We don't need a queue until we have a bottleneck that can't be resolved with batching."
-              </blockquote>
-              <p className="text-xs sm:text-sm text-[#f5efe8]/70 leading-relaxed max-w-xl">
-                Keep systems simple until scale demands otherwise. Every line of infrastructure added is a liability of maintenance and potential failure.
-              </p>
+                <Link
+                  href={`/selected-work/${project.id}`}
+                  className="mt-8 text-xs font-mono font-bold uppercase tracking-wider text-[#111111] border-b border-[#111111] pb-1 hover:opacity-75 transition-opacity"
+                >
+                  Read Story →
+                </Link>
+              </div>
             </div>
-            <span className="font-mono text-[9px] text-[#f5efe8]/40">// Operations Philosophy</span>
-          </div>
+          ))}
 
-          {/* Frame 04: Project 3 */}
-          <div className="film-exhibit-wrapper">
-            <ProjectFrame project={DISPLAY_PROJECTS[2]} frameNum="04" />
-          </div>
-
-          {/* Frame 05: Lesson Learned */}
-          <div className="film-exhibit w-[80vw] sm:w-[70vw] md:w-[60vw] max-w-[850px] aspect-[16/10.5] sm:aspect-[16/10] bg-[#fcfaf7] border border-[#111111]/10 rounded-2xl p-8 sm:p-12 flex flex-col justify-between select-none">
-            <span className="font-mono text-[9px] text-[#6b6b6b] uppercase tracking-[0.2em]">Frame 05 / Lesson Learned</span>
-            <div className="my-auto">
-              <blockquote className="text-2xl sm:text-3xl font-heading font-black tracking-tight leading-tight text-[#111111] mb-4">
-                "Software complexity grows quadratically with team size. Keep the code simple, keep the interfaces small."
-              </blockquote>
-              <p className="text-xs sm:text-sm text-[#6b6b6b] leading-relaxed max-w-xl">
-                Clean interfaces and strict boundaries save engineering hours, not complex frameworks. The best teams build minimal components that solve singular, clear constraints.
-              </p>
-            </div>
-            <span className="font-mono text-[9px] text-[#6b6b6b]/50">// Architecture Philosophy</span>
-          </div>
-
-          {/* Frame 06: Github CTA */}
-          <div className="film-exhibit w-[80vw] sm:w-[70vw] md:w-[60vw] max-w-[850px] aspect-[16/10.5] sm:aspect-[16/10] bg-transparent flex flex-col justify-center items-center text-center p-10 select-none">
-            <span className="font-mono text-[10px] text-[#6b6b6b] uppercase tracking-[0.2em] mb-4">
-              Frame 06 / The End of the Reel
+          {/* Ending Frame: Centered, full viewport width */}
+          <div className="w-[100vw] h-[65vh] flex flex-col justify-center items-center text-center px-12 select-none flex-shrink-0 relative z-10">
+            <span className="font-mono text-[10px] text-[#6b6b6b] uppercase tracking-widest mb-4">
+              End of Reel
             </span>
-            <p className="text-lg sm:text-xl text-[#111111]/80 max-w-md font-sans mb-8">
-              The projects shown here are only a small part of the story.
-            </p>
+            <h4 className="text-3xl sm:text-5xl md:text-6xl font-heading font-black tracking-tight leading-tight text-[#111111] max-w-3xl mb-8">
+              The projects shown here<br />
+              are only part of the story.
+            </h4>
             <a
               href="https://github.com/alexchen"
               target="_blank"
               rel="noreferrer"
-              className="text-2xl sm:text-3xl md:text-4xl font-heading font-black text-[#111111] hover:text-[#333333] tracking-tight border-b-2 border-current pb-2 transition-all flex items-center gap-2 group"
+              className="text-2xl sm:text-4xl md:text-5xl font-heading font-black text-[#111111] hover:text-[#333333] tracking-tight border-b-2 border-[#111111] pb-2 transition-all flex items-center gap-3 group mt-4 select-text"
             >
               <span>Explore everything on GitHub</span>
-              <ArrowRight className="inline-block group-hover:translate-x-2 transition-transform duration-300" size={24} />
+              <ArrowRight className="group-hover:translate-x-3 transition-transform duration-300" size={36} />
             </a>
           </div>
         </div>
@@ -156,84 +232,5 @@ export function SelectedWork() {
       {/* Bottom Spacer */}
       <div className="h-10 w-full bg-transparent" />
     </section>
-  )
-}
-
-interface ProjectFrameProps {
-  project: typeof projects[0]
-  frameNum: string
-}
-
-function ProjectFrame({ project, frameNum }: ProjectFrameProps) {
-  return (
-    <Link href={`/selected-work/${project.id}`} className="block">
-      <div className="film-exhibit w-[80vw] sm:w-[70vw] md:w-[60vw] max-w-[850px] aspect-[16/10.5] sm:aspect-[16/10] bg-[#fcfaf7] border border-[#111111]/10 rounded-2xl p-6 sm:p-10 flex flex-col justify-between cursor-pointer hover:border-[#111111]/25 hover:shadow-sm group transition-all duration-300 select-none">
-        
-        {/* Top bar */}
-        <div className="flex items-center justify-between text-[9px] font-mono tracking-wider text-[#6b6b6b]">
-          <span>FRAME {frameNum} / {project.status.toUpperCase()}</span>
-          <span className="flex items-center gap-1 group-hover:text-[#111111] transition-colors">
-            READ STORY <ArrowUpRight size={10} />
-          </span>
-        </div>
-
-        {/* Project Name and Tagline */}
-        <div className="mt-4">
-          <h3 className="text-2xl sm:text-3xl font-heading font-black text-[#111111] leading-none mb-1 group-hover:text-black transition-colors">
-            {project.name}
-          </h3>
-          <p className="text-xs text-[#6b6b6b] font-mono">
-            {project.tagline}
-          </p>
-        </div>
-
-        {/* Dynamic Details: Problem, Outcome, Impact (Tech Stack on Hover) */}
-        <div className="relative my-6 flex-grow flex flex-col justify-center border-y border-[#111111]/5 py-4 overflow-hidden min-h-[140px] md:min-h-[180px]">
-          
-          {/* Default Content: Problem, Outcome, Impact */}
-          <div className="flex flex-col gap-3 group-hover:opacity-0 transition-opacity duration-300 group-hover:pointer-events-none">
-            <div className="grid grid-cols-12 gap-2">
-              <span className="col-span-3 font-mono text-[9px] uppercase tracking-wider text-[#6b6b6b]">Problem</span>
-              <p className="col-span-9 text-xs text-[#111111]/80 leading-relaxed line-clamp-2 sm:line-clamp-3">{project.problem}</p>
-            </div>
-            
-            <div className="grid grid-cols-12 gap-2">
-              <span className="col-span-3 font-mono text-[9px] uppercase tracking-wider text-[#6b6b6b]">Outcome</span>
-              <p className="col-span-9 text-xs text-[#111111]/80 leading-relaxed line-clamp-2 sm:line-clamp-3">{project.solution}</p>
-            </div>
-
-            <div className="grid grid-cols-12 gap-2">
-              <span className="col-span-3 font-mono text-[9px] uppercase tracking-wider text-[#6b6b6b]">Impact</span>
-              <p className="col-span-9 text-xs font-semibold text-[#111111] leading-relaxed line-clamp-1">{project.metrics?.[0]}</p>
-            </div>
-          </div>
-
-          {/* Hover Overlay: Tech Stack */}
-          <div className="absolute inset-0 flex flex-col justify-center items-start opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-300">
-            <span className="font-mono text-[9px] uppercase tracking-wider text-[#6b6b6b] mb-3">Implemented Technology Stack</span>
-            <div className="flex flex-wrap gap-2 max-w-xl">
-              {project.techStack.map((tech) => (
-                <span
-                  key={tech}
-                  className="text-[10px] font-mono bg-[#111111]/5 border border-[#111111]/10 px-2.5 py-1 rounded text-[#111111]/80"
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
-            <span className="text-[10px] font-mono text-[#6b6b6b] mt-5 italic">
-              Click to explore design decisions & system architecture →
-            </span>
-          </div>
-
-        </div>
-
-        {/* Frame Footer */}
-        <div className="flex items-center justify-between text-[9px] font-mono text-[#6b6b6b]">
-          <span>Role: {project.status === 'open-source' ? 'Creator / Author' : 'Lead Architect'}</span>
-          <span>Click to View</span>
-        </div>
-      </div>
-    </Link>
   )
 }

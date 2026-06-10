@@ -3,33 +3,18 @@
 import React, { useState, useEffect } from 'react'
 import { useScrollProgress } from '@/hooks/useScrollProgress'
 import { cn } from '@/lib/utils'
-import { profile } from '@/data/profile'
 
 const navItems = [
   { label: 'Selected Work', href: '#selected-work', id: 'selected-work' },
-  { label: 'How I Think', href: '#how-i-think', id: 'how-i-think' },
-  { label: 'My Journey', href: '#my-journey', id: 'my-journey' },
-  { label: 'What I\'m Building Next', href: '#next-building', id: 'next-building' },
+  { label: 'Thinking', href: '#how-i-think', id: 'how-i-think' },
+  { label: 'Journey', href: '#my-journey', id: 'my-journey' },
+  { label: 'Next', href: '#next-building', id: 'next-building' },
   { label: 'Connect', href: '#connect', id: 'connect' },
 ]
 
 export function NavBar() {
-  const { activeSection, progress } = useScrollProgress()
-  const [scrolled, setScrolled] = useState(false)
+  const { activeSection } = useScrollProgress()
   const [menuOpen, setMenuOpen] = useState(false)
-
-  useEffect(() => {
-    // Check initial state asynchronously to avoid React 19 cascading render warning
-    const initialCheck = () => setScrolled(window.scrollY > 60)
-    const rafId = requestAnimationFrame(initialCheck)
-
-    const handler = () => setScrolled(window.scrollY > 60)
-    window.addEventListener('scroll', handler, { passive: true })
-    return () => {
-      cancelAnimationFrame(rafId)
-      window.removeEventListener('scroll', handler)
-    }
-  }, [])
 
   const scrollTo = (sectionId: string) => {
     setMenuOpen(false)
@@ -44,126 +29,85 @@ export function NavBar() {
         Skip to content
       </a>
 
-      {/* Progress bar */}
-      <div
-        className="fixed top-0 left-0 h-[2px] z-[60] bg-[#111111] transition-all duration-100"
-        style={{ width: `${progress * 100}%` }}
-        aria-hidden="true"
-      />
-
-      <header
-        className={cn(
-          'fixed top-3 left-1/2 -translate-x-1/2 z-50 transition-all duration-500',
-          scrolled ? 'w-[min(94vw,900px)]' : 'w-[min(98vw,1100px)]'
-        )}
-      >
-        <nav
-          className={cn(
-            'glass rounded-2xl px-4 sm:px-6 py-3 flex items-center justify-between transition-all duration-500',
-            scrolled && 'border-[#111111]/10 shadow-[0_8px_30px_rgba(17,17,17,0.04)]'
-          )}
-          aria-label="Main navigation"
-          role="navigation"
-        >
+      <header className="fixed top-[40px] left-0 w-full z-50 px-6 sm:px-12 md:px-16 pointer-events-none">
+        <div className="max-w-7xl mx-auto flex justify-between items-center pointer-events-auto">
           {/* Logo / Name */}
           <button
             onClick={() => scrollTo('hero')}
-            className="flex items-center gap-2.5 group"
+            className="font-heading font-black text-xl tracking-tight text-[#111111] hover:opacity-75 transition-opacity cursor-pointer select-none"
             aria-label="Scroll to top"
           >
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#111111]/5 border border-[#111111]/10 group-hover:border-[#111111]/25 transition-all duration-300">
-              <span className="text-[#111111] font-bold font-mono text-sm leading-none">A</span>
-            </div>
-            <span className="font-heading font-semibold text-sm text-[#111111]/90 hidden sm:block group-hover:text-[#111111] transition-colors">
-              {profile.name.split(' ')[0]}
-              <span className="text-[#6b6b6b] font-normal font-sans">
-                {' '}{profile.name.split(' ').slice(1).join(' ')}
-              </span>
-            </span>
+            ALEX
           </button>
 
           {/* Desktop Nav Links */}
-          <ul className="hidden md:flex items-center gap-1" role="list">
+          <ul className="hidden md:flex items-center gap-8 font-sans text-xs tracking-wider uppercase font-semibold text-[#6b6b6b]" role="list">
             {navItems.map((item) => {
               const isActive = activeSection === item.id
               return (
-                <li key={item.id}>
+                <li key={item.id} className="relative py-2 flex flex-col items-center">
                   <button
                     onClick={() => scrollTo(item.id)}
                     className={cn(
-                      'px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-300',
-                      isActive
-                        ? 'bg-[#111111]/10 text-[#111111] border border-[#111111]/15 font-semibold'
-                        : 'text-[#6b6b6b] hover:text-[#111111] hover:bg-[#111111]/5'
+                      'nav-link transition-colors duration-300 hover:text-[#111111] focus-visible:outline-none cursor-pointer',
+                      isActive ? 'text-[#111111] font-bold' : 'text-[#6b6b6b]'
                     )}
                     aria-current={isActive ? 'page' : undefined}
                   >
                     {item.label}
                   </button>
+                  {/* Underline grows from left on hover is handled in CSS, active dot here */}
+                  {isActive && (
+                    <span className="nav-dot" />
+                  )}
                 </li>
               )
             })}
           </ul>
 
-          {/* CTA + Mobile Toggle */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => scrollTo('connect')}
-              className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 border border-[#111111]/10 hover:border-[#111111]/20 bg-[#111111]/5 hover:bg-[#111111]/10 text-[#111111] rounded-lg text-xs font-mono font-medium transition-all duration-200"
-            >
-              <span className="status-dot w-1.5 h-1.5 inline-block bg-[#10B981]" />
-              <span>Available</span>
-            </button>
-
-            {/* Mobile hamburger */}
-            <button
-              className="md:hidden p-2 rounded-lg text-[#6b6b6b] hover:text-[#111111] hover:bg-[#111111]/5 transition-all"
-              onClick={() => setMenuOpen(!menuOpen)}
-              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={menuOpen}
-            >
-              <div className="flex flex-col gap-[5px] w-5">
-                <span className={cn('h-[1.5px] bg-current rounded transition-all duration-300', menuOpen && 'rotate-45 translate-y-[6.5px]')} />
-                <span className={cn('h-[1.5px] bg-current rounded transition-all duration-300', menuOpen && 'opacity-0 scale-x-0')} />
-                <span className={cn('h-[1.5px] bg-current rounded transition-all duration-300', menuOpen && '-rotate-45 -translate-y-[6.5px]')} />
-              </div>
-            </button>
+          {/* Availability / Status (Upper right, very subtle) */}
+          <div className="hidden sm:block text-[10px] font-mono tracking-widest uppercase text-[#111111]/60 font-medium select-none">
+            Open for meaningful work.
           </div>
-        </nav>
 
-        {/* Mobile Menu */}
-        <div
-          className={cn(
-            'md:hidden glass mt-2 rounded-2xl overflow-hidden transition-all duration-300',
-            menuOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'
-          )}
-        >
-          <ul className="p-3 flex flex-col gap-1" role="list">
-            {navItems.map((item) => (
-              <li key={item.id}>
-                <button
-                  onClick={() => scrollTo(item.id)}
-                  className={cn(
-                    'w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all',
-                    activeSection === item.id
-                      ? 'bg-[#111111]/10 text-[#111111]'
-                      : 'text-[#6b6b6b] hover:text-[#111111] hover:bg-[#111111]/5'
-                  )}
-                >
-                  {item.label}
-                </button>
-              </li>
-            ))}
-            <li>
-              <button
-                onClick={() => scrollTo('connect')}
-                className="w-full mt-2 py-3 bg-[#111111] text-[#f5efe8] hover:bg-[#222222] rounded-xl text-sm font-semibold transition-colors duration-200"
-              >
-                Get In Touch
-              </button>
-            </li>
-          </ul>
+          {/* Mobile hamburger */}
+          <button
+            className="md:hidden p-2 text-[#6b6b6b] hover:text-[#111111] transition-all cursor-pointer"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+          >
+            <div className="flex flex-col gap-[5px] w-5">
+              <span className={cn('h-[1.5px] bg-current rounded transition-all duration-300', menuOpen && 'rotate-45 translate-y-[6.5px]')} />
+              <span className={cn('h-[1.5px] bg-current rounded transition-all duration-300', menuOpen && 'opacity-0 scale-x-0')} />
+              <span className={cn('h-[1.5px] bg-current rounded transition-all duration-300', menuOpen && '-rotate-45 -translate-y-[6.5px]')} />
+            </div>
+          </button>
         </div>
+
+        {/* Mobile Menu (Minimal overlay layout) */}
+        {menuOpen && (
+          <div className="md:hidden absolute top-[50px] left-6 right-6 bg-[#fcfaf7] border border-[#111111]/10 rounded-xl p-4 shadow-lg pointer-events-auto">
+            <ul className="flex flex-col gap-4 font-sans text-xs tracking-wider uppercase font-semibold text-[#6b6b6b]" role="list">
+              {navItems.map((item) => (
+                <li key={item.id}>
+                  <button
+                    onClick={() => scrollTo(item.id)}
+                    className={cn(
+                      'w-full text-left py-2 border-b border-[#111111]/5 transition-all',
+                      activeSection === item.id ? 'text-[#111111] font-bold' : 'text-[#6b6b6b]'
+                    )}
+                  >
+                    {item.label}
+                  </button>
+                </li>
+              ))}
+              <li className="pt-2 text-[10px] font-mono tracking-widest text-[#111111]/60">
+                Open for meaningful work.
+              </li>
+            </ul>
+          </div>
+        )}
       </header>
     </>
   )

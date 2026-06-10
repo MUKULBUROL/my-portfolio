@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from 'react'
 import { SectionHeader } from '../ui/SectionHeader'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { experience } from '@/data/experience'
 
 const CHAPTERS = [
   {
@@ -32,11 +33,14 @@ const CHAPTERS = [
 export function MyJourney() {
   const containerRef = useRef<HTMLDivElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
+  const timelineRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger)
 
-    gsap.fromTo(
+    const triggers: ScrollTrigger[] = []
+
+    const headerST = gsap.fromTo(
       headerRef.current,
       { y: 30, opacity: 0 },
       {
@@ -51,25 +55,53 @@ export function MyJourney() {
         },
       }
     )
+    if (headerST.scrollTrigger) triggers.push(headerST.scrollTrigger)
 
     const cards = containerRef.current?.querySelectorAll('.chapter-card')
     cards?.forEach((card) => {
-      gsap.fromTo(
+      const anim = gsap.fromTo(
         card,
-        { opacity: 0, y: 40 },
+        { clipPath: 'polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)', y: 40 },
         {
-          opacity: 1,
+          clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
           y: 0,
-          duration: 0.8,
+          duration: 1.0,
           ease: 'power3.out',
           scrollTrigger: {
             trigger: card,
-            start: 'top 80%',
+            start: 'top 85%',
             once: true,
           },
         }
       )
+      if (anim.scrollTrigger) triggers.push(anim.scrollTrigger)
     })
+
+    // Animate each experience row
+    const rows = timelineRef.current?.querySelectorAll('.exp-row')
+    rows?.forEach((row, i) => {
+      const anim = gsap.fromTo(
+        row,
+        { x: -20, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 0.6,
+          ease: 'power2.out',
+          delay: i * 0.08,
+          scrollTrigger: {
+            trigger: row,
+            start: 'top 90%',
+            once: true,
+          },
+        }
+      )
+      if (anim.scrollTrigger) triggers.push(anim.scrollTrigger)
+    })
+
+    return () => {
+      triggers.forEach((t) => t.kill())
+    }
   }, [])
 
   return (
@@ -98,9 +130,9 @@ export function MyJourney() {
                   Chapter {chapter.number} / {chapter.title}
                 </span>
 
-                {/* Massive Narrative Quote */}
+                {/* Narrative Quote */}
                 <h3 className="text-xl sm:text-2xl font-heading font-black text-[#111111] leading-tight mb-4 tracking-tight">
-                  "{chapter.quote}"
+                  &ldquo;{chapter.quote}&rdquo;
                 </h3>
               </div>
 
@@ -120,6 +152,65 @@ export function MyJourney() {
             </div>
           ))}
         </div>
+
+        {/* ── Experience Timeline ── */}
+        <div ref={timelineRef} className="mt-20">
+          <div className="flex items-center gap-3 mb-8">
+            <span className="h-px flex-1 bg-[#111111]/10" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-[#6b6b6b]">
+              Experience Record
+            </span>
+            <span className="h-px flex-1 bg-[#111111]/10" />
+          </div>
+
+          <div className="flex flex-col gap-0 border-t border-[#111111]/10">
+            {experience.map((exp) => (
+              <div
+                key={`${exp.company}-${exp.startDate}`}
+                className="exp-row grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-8 py-7 border-b border-[#111111]/10 items-start hover:bg-[#111111]/[0.02] px-2 transition-colors duration-200"
+              >
+                {/* Dates */}
+                <div className="md:col-span-3 flex flex-col">
+                  <span className="font-mono text-[9px] text-[#6b6b6b] uppercase tracking-widest">
+                    {exp.startDate} — {exp.endDate}
+                  </span>
+                  <span className="font-mono text-[9px] text-[#6b6b6b]/70 mt-1">
+                    {exp.location}
+                  </span>
+                </div>
+
+                {/* Role + Company */}
+                <div className="md:col-span-4 flex flex-col">
+                  <h4 className="text-sm font-heading font-black text-[#111111] tracking-tight">
+                    {exp.role}
+                  </h4>
+                  <span className="font-mono text-[10px] text-[#6b6b6b] mt-0.5">
+                    {exp.company}
+                  </span>
+                </div>
+
+                {/* Key Achievement */}
+                <div className="md:col-span-5">
+                  <p className="text-xs text-[#6b6b6b] leading-relaxed font-sans">
+                    {exp.achievements[0]}
+                  </p>
+                  {/* Stack tags */}
+                  <div className="flex flex-wrap gap-1 mt-3">
+                    {exp.techStack.slice(0, 4).map((tech) => (
+                      <span
+                        key={tech}
+                        className="text-[9px] font-mono bg-[#111111]/5 border border-[#111111]/8 px-1.5 py-0.5 rounded text-[#111111]/70"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
       </div>
     </section>
   )
