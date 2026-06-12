@@ -95,7 +95,7 @@ export function HowIThink() {
   const selectedData = NODES.find((n) => n.id === selectedNode)
 
   return (
-    <section id="how-i-think" ref={sectionRef} className="py-24 relative overflow-hidden bg-[#f5efe8]">
+    <section id="how-i-think" ref={sectionRef} className="py-24 relative overflow-hidden bg-[#f5efe8]" aria-label="System design thinking">
       <div className="max-w-6xl mx-auto px-6">
         
         {/* Header */}

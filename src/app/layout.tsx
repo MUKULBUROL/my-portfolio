@@ -3,6 +3,8 @@ import { Inter, Outfit, Fira_Code } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 import { NavBar } from '@/components/ui/NavBar'
+import { CustomCursor } from '@/components/ui/CustomCursor'
+import { FluidCanvas } from '@/components/ui/FluidCanvas'
 import { profile } from '@/data/profile'
 
 const inter = Inter({
@@ -23,7 +25,7 @@ const firaCode = Fira_Code({
   display: 'swap',
 })
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://alexchen.dev'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mukul-kumar.dev'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -65,7 +67,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: `${profile.name} — ${profile.headline}`,
     description: profile.shortBio,
-    creator: '@alexchen',
+    creator: '@mukulburoli',
     images: ['/og-image.png'],
   },
   robots: {
@@ -92,8 +94,8 @@ const jsonLd = {
   jobTitle: profile.headline,
   description: profile.shortBio,
   sameAs: [
-    'https://github.com/alexchen',
-    'https://linkedin.com/in/alexchen',
+    'https://github.com/MUKULBUROL',
+    'https://www.linkedin.com/in/mukul-kumar-036587254/',
   ],
 }
 
@@ -116,9 +118,19 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <meta name="theme-color" content="#f5efe8" />
       </head>
-      <body className="min-h-full bg-[#f5efe8] text-[#111111] overflow-x-hidden">
+      <body className="min-h-full bg-transparent text-[#111111] overflow-x-hidden">
+        {/* Global watery background — fixed behind all content */}
+        <FluidCanvas fixed />
+
+        {/* Film grain overlay */}
         <div className="film-grain-overlay" aria-hidden="true" />
+
+        {/* Gradient mesh overlay */}
+        <div className="gradient-mesh" aria-hidden="true" />
+
         <Providers>
+          {/* Unseen.co-style circular cursor */}
+          <CustomCursor />
           <NavBar />
           <main id="main-content">{children}</main>
         </Providers>

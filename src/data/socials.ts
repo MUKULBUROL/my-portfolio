@@ -3,22 +3,22 @@ import type { SocialLink } from '@/types'
 export const socials: SocialLink[] = [
   {
     label: 'GitHub',
-    url: 'https://github.com/alexchen',
+    url: 'https://github.com/MUKULBUROL',
     icon: 'Github',
-    username: '@alexchen',
+    username: '@MUKULBUROL',
   },
   {
     label: 'LinkedIn',
-    url: 'https://linkedin.com/in/alexchen',
+    url: 'https://www.linkedin.com/in/mukul-kumar-036587254/',
     icon: 'Linkedin',
-    username: 'Alex Chen',
+    username: 'Mukul Kumar',
   },
   {
     label: 'Email',
-    url: 'mailto:alex@example.com',
+    url: 'mailto:mukulburoli@gmail.com',
     icon: 'Mail',
-    username: 'alex@example.com',
+    username: 'mukulburoli@gmail.com',
   },
 ]
 
-export const emailAddress = 'alex@example.com'
+export const emailAddress = 'mukulburoli@gmail.com'

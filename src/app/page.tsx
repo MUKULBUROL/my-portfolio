@@ -1,47 +1,82 @@
 import { Hero } from '@/components/sections/Hero'
+import { Skills } from '@/components/sections/Skills'
 import { SelectedWork } from '@/components/sections/SelectedWork'
 import { Pause } from '@/components/sections/Pause'
 import { HowIThink } from '@/components/sections/HowIThink'
-import { MyJourney } from '@/components/sections/MyJourney'
 import { WhatImBuildingNext } from '@/components/sections/WhatImBuildingNext'
 import { Connect } from '@/components/sections/Connect'
+import { InteractiveSVGDivider } from '@/components/ui/InteractiveSVGDivider'
+import { prisma } from '@/lib/db'
+import type { ProjectItem } from '@/types'
 
-/**
- * Section order optimised for both recruiter and editorial goals:
- *  1. Hero           — Immediate identity + aesthetic hook
- *  2. SelectedWork   — Projects first (recruiter-critical in <30s scan)
- *  3. Pause          — Typographic breath / philosophy beat
- *  4. HowIThink      — Systems architecture mindset
- *  5. MyJourney      — Narrative chapters + full experience record
- *  6. BuildingNext   — Research / future signal
- *  7. Connect        — CTA
- */
-export default function HomePage() {
+async function getProjectsFromDb(): Promise<ProjectItem[]> {
+  const dbUrl = process.env.DATABASE_URL
+  if (!dbUrl || dbUrl.includes('johndoe')) {
+    return []
+  }
+
+  try {
+    const dbProjects = await prisma.project.findMany({
+      orderBy: { createdAt: 'desc' },
+    })
+    return dbProjects.map((p) => ({
+      id: p.id,
+      name: p.title,
+      tagline: p.description.slice(0, 80) + '...',
+      description: p.description,
+      problem: p.problem,
+      solution: p.results,
+      architecture: p.architecture,
+      challenges: p.challenges,
+      results: p.results,
+      metrics: p.metrics ? [p.metrics] : [],
+      techStack: p.techStack,
+      tags: p.techStack.slice(0, 3),
+      githubUrl: p.githubUrl || undefined,
+      liveUrl: p.liveUrl || undefined,
+      imageUrl: p.imageUrl || undefined,
+      featured: p.featured,
+      status: 'production',
+      lessonsLearned: '',
+    }))
+  } catch (err) {
+    console.error('Error fetching database projects, falling back to static projects:', err)
+    return []
+  }
+}
+
+export default async function HomePage() {
+  const dbProjects = await getProjectsFromDb()
+
   return (
     <>
       <Hero />
 
-      <SelectedWork />
+      <InteractiveSVGDivider />
 
-      <div className="section-divider mx-auto max-w-5xl" aria-hidden="true" />
+      <Skills />
+
+      <InteractiveSVGDivider />
+
+      <SelectedWork initialProjects={dbProjects} />
+
+      <InteractiveSVGDivider />
 
       <Pause />
 
-      <div className="section-divider mx-auto max-w-5xl" aria-hidden="true" />
+      <InteractiveSVGDivider />
 
       <HowIThink />
 
-      <div className="section-divider mx-auto max-w-5xl" aria-hidden="true" />
-
-      <MyJourney />
-
-      <div className="section-divider mx-auto max-w-5xl" aria-hidden="true" />
+      <InteractiveSVGDivider />
 
       <WhatImBuildingNext />
 
-      <div className="section-divider mx-auto max-w-5xl" aria-hidden="true" />
+      <InteractiveSVGDivider />
 
       <Connect />
     </>
   )
 }
+
+

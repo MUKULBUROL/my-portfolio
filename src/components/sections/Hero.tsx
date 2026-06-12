@@ -1,73 +1,195 @@
 'use client'
 
 import React, { useEffect, useRef } from 'react'
+import Image from 'next/image'
 import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { MagneticButton } from '../ui/MagneticButton'
-import { ArrowRight, ChevronDown } from 'lucide-react'
+import { ArrowRight, ChevronDown, Download, Mail } from 'lucide-react'
 import { profile } from '@/data/profile'
-import { FluidCanvas } from '../ui/FluidCanvas'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+
+gsap.registerPlugin(ScrollTrigger)
+
+const techStack = [
+  { name: 'React', icon: '⚛️' },
+  { name: 'Node.js', icon: '🟢' },
+  { name: 'Python', icon: '🐍' },
+  { name: 'TypeScript', icon: '📘' },
+  { name: 'Go', icon: '🔵' },
+  { name: 'Docker', icon: '🐳' },
+]
 
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null)
   const nameRef = useRef<HTMLHeadingElement>(null)
+  const subtitleRef = useRef<HTMLHeadingElement>(null)
+  const underlineRef = useRef<SVGPathElement>(null)
   const roleRef = useRef<HTMLDivElement>(null)
   const descRef = useRef<HTMLDivElement>(null)
+  const techRef = useRef<HTMLDivElement>(null)
   const ctaRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const canvasWrapperRef = useRef<HTMLDivElement>(null)
+  const photoRef = useRef<HTMLDivElement>(null)
   const prefersReducedMotion = useReducedMotion()
+  const fullName = profile.name.toUpperCase()
 
   useEffect(() => {
-    const els = [canvasWrapperRef.current, nameRef.current, roleRef.current, descRef.current, ctaRef.current, scrollRef.current]
+    const nameEl = nameRef.current
+    if (!nameEl) return
 
     if (prefersReducedMotion) {
-      // Skip animation — immediately show everything at final state
-      els.forEach((el) => { if (el) gsap.set(el, { opacity: 1, y: 0 }) })
+      nameEl.innerHTML = fullName.split('').map(char =>
+        char === ' ' ? '<span class="char-space"> </span>' : `<span class="char">${char}</span>`
+      ).join('')
+      if (subtitleRef.current) gsap.set(subtitleRef.current, { opacity: 1, y: 0 })
       return
     }
 
-    // GSAP sequenced reveal timeline (max 2 seconds total duration)
+    const ctx = gsap.context(() => {
+      // Split name into two lines: MUKUL and KUMAR
+      const firstName = 'MUKUL'
+      const lastName = 'KUMAR'
+      
+      nameEl.innerHTML = `
+        <span class="block">${firstName.split('').map(char =>
+          `<span class="char">${char}</span>`
+        ).join('')}</span>
+        <span class="block">${lastName.split('').map(char =>
+          `<span class="char">${char}</span>`
+        ).join('')}</span>
+      `
+
+      // Animate characters
+      gsap.from('.char', {
+        opacity: 0,
+        y: 100,
+        rotateX: -90,
+        stagger: 0.05,
+        duration: 0.8,
+        ease: 'power3.out',
+        delay: 0.5,
+      })
+
+      // Fade in subtitle
+      gsap.from(subtitleRef.current, {
+        opacity: 0,
+        y: 30,
+        duration: 1,
+        delay: 2.5,
+        ease: 'power3.out',
+      })
+    })
+
+    return () => ctx.revert()
+  }, [fullName, prefersReducedMotion])
+
+  useEffect(() => {
+    const els = [
+      photoRef.current,
+      roleRef.current,
+      descRef.current,
+      techRef.current,
+      ctaRef.current,
+      scrollRef.current,
+    ]
+
+    if (prefersReducedMotion) {
+      els.forEach((el) => { if (el) gsap.set(el, { opacity: 1, y: 0 }) })
+      if (underlineRef.current) {
+        gsap.set(underlineRef.current, { strokeDashoffset: 0 })
+      }
+      return
+    }
+
+    // Set up underline length
+    const underlineEl = underlineRef.current
+    if (underlineEl) {
+      const length = underlineEl.getTotalLength()
+      gsap.set(underlineEl, { strokeDasharray: length, strokeDashoffset: length })
+    }
+
+    // Sequenced reveal timeline
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
-    tl.fromTo(
-      canvasWrapperRef.current,
-      { opacity: 0 },
-      { opacity: 1, duration: 0.6 }
-    )
-      .fromTo(
-        nameRef.current,
-        { y: 35, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6 },
-        '-=0.3'
-      )
-      .fromTo(
-        roleRef.current,
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.4 },
-        '-=0.3'
-      )
-      .fromTo(
-        descRef.current,
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.4 },
-        '-=0.3'
-      )
-      .fromTo(
-        ctaRef.current,
-        { y: 15, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.4 },
-        '-=0.2'
-      )
-      .fromTo(
-        scrollRef.current,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.3 },
-        '-=0.1'
-      )
+    tl.fromTo(photoRef.current, { opacity: 0, scale: 0.88 }, { opacity: 1, scale: 1, duration: 0.8 })
+      
+    if (underlineEl) {
+      tl.to(underlineEl, {
+        strokeDashoffset: 0,
+        duration: 1.2,
+        ease: 'power2.inOut',
+      }, '+=1.5')
+    }
+
+    tl.fromTo(roleRef.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4 }, '-=0.3')
+      .fromTo(descRef.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4 }, '-=0.3')
+      .fromTo(techRef.current, { y: 15, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4 }, '-=0.2')
+      .fromTo(ctaRef.current, { y: 15, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4 }, '-=0.2')
+      .fromTo(scrollRef.current, { opacity: 0 }, { opacity: 1, duration: 0.3 }, '-=0.1')
+
+    // Gentle floating animation on photo — continuous
+    let floatTween: gsap.core.Tween | null = null
+    if (photoRef.current) {
+      floatTween = gsap.to(photoRef.current, {
+        y: -12,
+        duration: 3.2,
+        ease: 'sine.inOut',
+        yoyo: true,
+        repeat: -1,
+        delay: 0.9,
+      })
+    }
 
     return () => {
       tl.kill()
+      floatTween?.kill()
+    }
+  }, [prefersReducedMotion])
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container || prefersReducedMotion) return
+
+    // Parallax on scroll — elements move at different speeds
+    const nameParallax = gsap.to(nameRef.current, {
+      y: -80,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: container,
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1.5,
+      },
+    })
+
+    const photoParallax = gsap.to(photoRef.current, {
+      y: -50,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: container,
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 2,
+      },
+    })
+
+    const textParallax = gsap.to([roleRef.current, descRef.current, techRef.current, ctaRef.current], {
+      y: -30,
+      opacity: 0,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: container,
+        start: '30% top',
+        end: '60% top',
+        scrub: 1,
+      },
+    })
+
+    return () => {
+      nameParallax.scrollTrigger?.kill()
+      photoParallax.scrollTrigger?.kill()
+      textParallax.scrollTrigger?.kill()
     }
   }, [prefersReducedMotion])
 
@@ -79,58 +201,145 @@ export function Hero() {
     <section
       id="hero"
       ref={containerRef}
-      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-[#f5efe8] pt-20"
+      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden pt-20"
+      style={{ background: 'transparent' }}
       aria-label="Hero section"
     >
-      {/* Fullscreen procedural canvas wrapper */}
-      <div ref={canvasWrapperRef} className="absolute inset-0 z-0 opacity-0">
-        <FluidCanvas />
+      {/* Subtle vignette overlay */}
+      <div
+        className="absolute inset-0 bg-gradient-to-b from-[#f5efe8]/10 via-transparent to-[#f5efe8]/30 pointer-events-none z-0"
+        aria-hidden="true"
+      />
+
+      {/* Animated gradient mesh background */}
+      <div className="hero-bg-mesh" aria-hidden="true">
+        <div className="hero-mesh-accent" />
       </div>
 
-      {/* Subtle overlay vignette */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#f5efe8]/20 via-transparent to-[#f5efe8]/40 pointer-events-none z-0" aria-hidden="true" />
+      {/* Main asymmetric layout */}
+      <div className="relative z-10 max-w-6xl mx-auto px-8 sm:px-12 md:px-16 w-full py-16 flex flex-col md:flex-row items-center justify-between gap-12 min-h-[85vh]">
 
-      {/* Main asymmetric layout container */}
-      <div className="relative z-10 max-w-6xl mx-auto px-8 sm:px-12 md:px-16 w-full py-16 flex flex-col min-h-[85vh] justify-center items-start text-left select-none">
-        
-        {/* Massive Typography Name — Left-aligned, max-width 80%, slightly offset */}
-        <h1
-          ref={nameRef}
-          className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black font-heading tracking-tight leading-[0.95] text-[#111111] mb-12 select-none opacity-0 text-left max-w-[80%] md:ml-[5%]"
-        >
-          {profile.name.toUpperCase()}
-        </h1>
+        {/* ── Left column: text ── */}
+        <div className="flex flex-col items-start text-left select-none flex-1 order-2 md:order-1">
 
-        {/* Asymmetric Content Columns */}
-        <div className="w-full flex flex-col md:flex-row justify-between items-start gap-8 md:gap-16 mt-4 md:pl-[10%]">
-          
-          {/* Narrow supporting column (Role and description) */}
-          <div className="flex flex-col items-start max-w-md w-full">
-            {/* Role Under name */}
-            <div ref={roleRef} className="h-auto mb-4 opacity-0">
-              <h2 className="font-sans text-lg sm:text-xl md:text-2xl font-bold text-[#111111]/85 tracking-wide">
-                {profile.headline}
-              </h2>
-            </div>
+          {/* Name container with underline */}
+          <div className="relative mb-14 sm:mb-16">
+            {/* Name with staggered character reveal */}
+            <h1
+              ref={nameRef}
+              className="text-5xl sm:text-7xl md:text-8xl font-black font-heading tracking-tight leading-[0.95] text-[#111111] select-none"
+            />
 
-            {/* Supporting text description */}
-            <div ref={descRef} className="mb-8 opacity-0">
-              <p className="text-[#6b6b6b] text-base sm:text-lg leading-relaxed font-sans">
-                Building intelligent systems, modern products, and meaningful experiences.
-              </p>
-            </div>
+            {/* Creative hand-drawn accent line SVG */}
+            <svg
+              className="absolute left-0 -bottom-6 w-[160px] sm:w-[220px] md:w-[280px] h-[20px] pointer-events-none"
+              viewBox="0 0 280 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                ref={underlineRef}
+                d="M 6 8 C 65 14, 185 2, 274 10 C 210 13, 110 16, 40 12 C 120 10, 205 7, 260 12"
+                stroke="#7C3AED"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </div>
 
-          {/* CTA Button — Offset from center, placed to the right on desktop */}
-          <div ref={ctaRef} className="opacity-0 md:self-end md:mb-8 pl-2">
+          {/* Role + description */}
+          <div ref={roleRef} className="mb-4 opacity-0">
+            <h2 ref={subtitleRef} className="font-sans text-lg sm:text-xl md:text-2xl font-bold text-[#111111]/85 tracking-wide opacity-0">
+              {profile.headline}
+            </h2>
+          </div>
+
+          <div ref={descRef} className="mb-8 opacity-0">
+            <p className="text-[#6b6b6b] text-base sm:text-lg leading-relaxed font-sans max-w-md">
+              High-performance backends, <span className="text-highlight">AI pipelines</span>, and systems that actually work in production.
+            </p>
+          </div>
+
+          {/* Tech Stack Icons */}
+          <div ref={techRef} className="flex items-center gap-3 mb-10 opacity-0">
+            {techStack.map((tech) => (
+              <div
+                key={tech.name}
+                className="tech-icon"
+                title={tech.name}
+              >
+                <span className="text-lg">{tech.icon}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* CTA Buttons */}
+          <div ref={ctaRef} className="flex items-center gap-4 opacity-0">
             <MagneticButton
-              onClick={() => scrollToSection('selected-work')}
-              className="px-8 py-4 bg-[#111111] hover:bg-[#222222] text-[#f5efe8] rounded-full text-xs font-mono font-semibold tracking-wide flex items-center justify-center gap-2 group transition-all duration-300"
+              onClick={() => scrollToSection('skills')}
+              className="cta-button px-8 py-4 bg-[#111111] hover:bg-[#222222] text-[#f5efe8] rounded-full text-xs font-mono font-semibold tracking-wide flex items-center justify-center gap-2 group"
               aria-label="View selected work"
             >
               <span>View Selected Work</span>
-              <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform duration-300" />
+              <ArrowRight size={13} className="group-hover:translate-x-1.5 transition-transform duration-300" />
             </MagneticButton>
+
+            <a
+              href="/resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cta-button-outline px-6 py-4 border border-[#111111]/20 hover:border-[#111111] text-[#111111] rounded-full text-xs font-mono font-semibold tracking-wide flex items-center justify-center gap-2"
+            >
+              <Download size={12} />
+              <span>Resume</span>
+            </a>
+
+            <MagneticButton
+              onClick={() => scrollToSection('connect')}
+              className="cta-button-outline px-6 py-4 border border-[#111111]/20 hover:border-[#111111] text-[#111111] rounded-full text-xs font-mono font-semibold tracking-wide flex items-center justify-center gap-2"
+              aria-label="Let's talk"
+            >
+              <Mail size={12} />
+              <span>Let's Talk</span>
+            </MagneticButton>
+          </div>
+        </div>
+
+        {/* ── Right column: photo ── */}
+        <div
+          ref={photoRef}
+          className="opacity-0 flex-shrink-0 order-1 md:order-2 relative"
+          aria-hidden="false"
+        >
+          {/* Animated gradient border wrapper */}
+          <div className="relative inline-block">
+            {/* Rotating gradient layers */}
+            <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 animate-gradient-xy opacity-80" />
+            <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600 animate-gradient-xy-reverse opacity-60" />
+            
+            {/* Photo frame — circular with border */}
+            <div className="relative w-56 h-56 sm:w-72 sm:h-72 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-warm-beige shadow-2xl animate-float">
+              <Image
+                src="/Profile.jpg"
+                alt={`${profile.name} — ${profile.headline}`}
+                fill
+                sizes="(max-width: 640px) 224px, (max-width: 768px) 288px, 320px"
+                className="object-cover object-center"
+                priority
+              />
+            </div>
+          </div>
+
+          {/* Floating badge — availability status */}
+          <div
+            className="availability-badge absolute -bottom-3 -right-3 flex items-center gap-2 bg-white/80 backdrop-blur-sm border border-[#111111]/8 rounded-full px-3 py-1.5 shadow-md"
+          >
+            <span className="tooltip">Available for freelance/full-time</span>
+            <span className="status-dot-pulse" />
+            <span className="text-[10px] font-mono text-[#111111] font-semibold tracking-wide">
+              {profile.availabilityLabel}
+            </span>
           </div>
         </div>
       </div>

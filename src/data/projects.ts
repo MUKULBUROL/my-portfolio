@@ -2,130 +2,96 @@ import type { ProjectItem } from '@/types'
 
 export const projects: ProjectItem[] = [
   {
-    id: 'autonomous-agents-orchestrator',
-    name: 'Autonomous Agents Orchestrator',
-    tagline: 'Enterprise multi-agent framework for automated software QA',
+    id: 'documind-ai',
+    name: 'DocuMind AI – Document Intelligence Platform',
+    tagline: 'AI-powered platform for semantic search and audio insights via Podcast Mode',
     description:
-      'A production-grade orchestration layer that coordinates multiple LLM agents to perform automated code review, regression testing, and documentation generation across large engineering teams.',
+      'An AI-powered platform enabling PDF upload, semantic search, and audio insights via Podcast Mode. Ranked in the Top 100 out of 60,000+ teams at Adobe Hackathon.',
     problem:
-      'Manual QA and verification bottlenecks consumed 30+ engineering hours per release cycle, creating unpredictable delivery timelines and increasing the risk of regression bugs reaching production.',
+      'Finding relevant information across large document collections is time-consuming and inefficient. Users need a smarter way to search, understand, and consume document content.',
     solution:
-      'Designed a hierarchical agent system where a coordinator LLM decomposes tasks and delegates to specialized sub-agents. Each sub-agent has a constrained context window and a specific tool set, ensuring focused, reliable outputs.',
+      'Built an end-to-end document intelligence platform with FastAPI backend, semantic search using OpenAI embeddings, and an Azure TTS pipeline for automated audio generation in Podcast Mode.',
     architecture:
-      'Event-driven distributed architecture. Next.js Server Actions coordinate task distribution to a Python FastAPI layer managing agent containers. Redis queues handle task spikes and rate-limiting. A vector store (pgvector) enables semantic execution memory and deduplication.',
+      'FastAPI backend with APIs for document ingestion and semantic queries. Google Gemini for AI processing, OpenAI embeddings for vector search, and Docker for scalable, modular deployment.',
     challenges:
-      'API rate-limiting and token exhaustion at scale. Solved with a hierarchical context compressor that summarizes prior agent states and caches them in Redis, reducing total token consumption by 40%.',
+      'Integrating multiple AI services (Gemini, OpenAI) while maintaining low latency and ensuring accurate semantic retrieval across diverse document formats.',
     results:
-      'Reduced QA cycle time by 90%. Eliminated major regression escapes. Enabled 3-day release cadences without increasing QA headcount.',
+      'Ranked in the Top 100 out of 60,000+ teams at Adobe Hackathon. Delivered a fully functional platform with document ingestion, semantic search, and podcast-mode audio generation.',
     metrics: [
-      '90% QA cycle time reduction',
-      '40% token cost savings',
-      '1.2s average agent response time',
-      'Zero regression escapes in 6 months',
+      'Top 100 out of 60,000+ teams at Adobe Hackathon',
+      'End-to-end document ingestion pipeline',
+      'Semantic search with OpenAI embeddings',
+      'Azure TTS for automated audio generation',
     ],
     techStack: [
-      'Next.js 15',
-      'React 19',
-      'TypeScript',
       'Python',
-      'LangGraph',
-      'PostgreSQL',
-      'Redis',
+      'FastAPI',
+      'Google Gemini',
+      'OpenAI',
       'Docker',
-      'AWS ECS',
+      'Azure TTS',
     ],
-    tags: ['AI', 'Next.js', 'Python', 'Agents'],
-    githubUrl: 'https://github.com/alexchen/agents-orchestrator',
-    liveUrl: 'https://agents.alexchen.dev',
+    tags: ['AI', 'Python', 'FastAPI', 'NLP'],
     featured: true,
     status: 'production',
-    lessonsLearned: 'Agent workflows require strict task boundaries; giving an agent too broad a tool set leads to prompt drift and loops. Constrained contexts and deterministic routing graphs are essential for system stability.',
+    lessonsLearned: 'Combining multiple AI services requires careful orchestration. Semantic search alone is not enough — pairing it with audio generation creates a more accessible and versatile platform.',
   },
   {
-    id: 'synthetic-healthcare-data',
-    name: 'Synthetic Healthcare Data Factory',
-    tagline: 'HIPAA-compliant patient profile generation for staging environments',
+    id: 'smart-expense-splitter',
+    name: 'Smart Expense Splitter System',
+    tagline: 'High-performance backend for managing group expenses with optimized settlements',
     description:
-      'A generative platform that produces statistically valid, relationship-consistent synthetic medical records for healthcare engineering teams who cannot use production data during development.',
+      'A high-performance backend platform for managing group expenses with optimized settlements, built with Java 17 and Spring Boot.',
     problem:
-      'HIPAA regulations prevent using real patient data in staging environments, forcing teams to test against unrealistic dummy data, leading to edge-case failures discovered only in production.',
+      'Group expense tracking and fair settlement is complex when multiple people share costs across various activities. Manual calculation is error-prone and time-consuming.',
     solution:
-      'Built a deep-learning generative pipeline using a conditional variational autoencoder trained on publicly available medical datasets. A Next.js dashboard allows teams to configure schema constraints, demographics, and data volumes.',
+      'Developed a scalable backend using Java 17 and Spring Boot with a highly normalized MySQL database via Spring Data JPA. Engineered a Greedy Settlement Algorithm to compute net balances and optimally match debtors with creditors.',
     architecture:
-      'PyTorch inference service wrapped in FastAPI. Next.js dashboard orchestrates schema definitions via tRPC. PostgreSQL stores generation jobs and output metadata. Outputs are delivered as SQL dumps or JSON for direct import.',
+      'Spring Boot REST API with Spring Data JPA for ORM. MySQL database with highly normalized schema handling complex Many-to-Many relationships. Greedy Settlement Algorithm minimizes total transaction count.',
     challenges:
-      'Generated records must satisfy complex temporal constraints (e.g. prescription dates after diagnosis dates) and clinical plausibility rules. Implemented a constraint-satisfaction post-processing layer using a rule engine.',
+      'Resolving bidirectional ORM dependency issues to ensure stable JSON serialization and faster REST API responses. Optimizing the settlement algorithm for minimal transactions.',
     results:
-      'Unblocked staging environments for 5 healthcare product teams. Each can now generate statistically valid patient cohorts in under 30 seconds.',
+      'Efficiently manages group expenses with optimal settlement calculations. Minimized total transaction count through greedy algorithm optimization.',
     metrics: [
-      '100% HIPAA compliant by design',
-      '50,000 profiles per minute throughput',
-      '5 product teams unblocked',
-      '<30 second generation for 10k profiles',
+      'Optimized settlement algorithm',
+      'Normalized MySQL database design',
+      'Fast REST API responses',
+      'Handles complex Many-to-Many relationships',
     ],
-    techStack: ['Next.js', 'TypeScript', 'Python', 'PyTorch', 'FastAPI', 'PostgreSQL', 'Docker'],
-    tags: ['AI', 'Python', 'Healthcare', 'Next.js'],
-    githubUrl: 'https://github.com/alexchen/synthetic-health-data',
+    techStack: ['Java 17', 'Spring Boot', 'Spring Data JPA', 'MySQL', 'REST API'],
+    tags: ['Java', 'Backend', 'Database', 'Algorithms'],
+    githubUrl: 'https://github.com/MUKULBUROL/Splitwise-Springboot-project',
     featured: true,
     status: 'production',
-    lessonsLearned: 'Statistically valid data is only useful if it respects domain-specific logical invariants. Post-generation rule validation is more performant than trying to embed every constraint into the generative model\'s latent space.',
+    lessonsLearned: 'ORM bidirectional dependencies can cause serialization issues. Careful schema design and algorithm optimization are critical for performance in financial systems.',
   },
   {
-    id: 'rag-document-intelligence',
-    name: 'RAG Document Intelligence Platform',
-    tagline: 'Semantic search and Q&A across enterprise knowledge bases',
+    id: 'graph-recommendation-system',
+    name: 'Graph-Based Recommendation System',
+    tagline: 'High-performance recommendation engine with real-time updates',
     description:
-      'A retrieval-augmented generation system that enables engineering teams to ask natural language questions across codebases, architecture documents, runbooks, and Confluence wikis.',
+      'A high-performance recommendation engine modeling user-item interactions as weighted graphs with real-time updates, developed in C++17.',
     problem:
-      "Knowledge is siloed across Notion, Confluence, GitHub wikis, and internal Slack threads. Engineers waste hours searching for architectural decisions or on-call procedures.",
+      'Traditional recommendation systems often lack real-time responsiveness and multi-metric similarity analysis, leading to less relevant suggestions.',
     solution:
-      'Built a document ingestion pipeline that chunks, embeds, and indexes content from multiple sources into pgvector. A Next.js frontend provides a chat interface where users can ask questions, cite sources, and refine answers.',
+      'Developed in C++17 with multi-metric similarity (Cosine, Jaccard, Pearson, Euclidean) and priority-queue traversal for top-K recommendations. Optimized for sub-millisecond latency.',
     architecture:
-      'Ingestion workers use LangChain document loaders to pull from Confluence, GitHub, and Notion APIs. Content is chunked with semantic-aware splitters and embedded using OpenAI Ada-002. Retrieval uses hybrid BM25 + vector similarity scoring.',
+      'Graph-based data structure modeling user-item interactions as weighted edges. Multi-metric similarity computation with priority-queue traversal for efficient top-K recommendation retrieval.',
     challenges:
-      'Handling stale document versions and conflicting information across sources. Solved by implementing freshness scoring in the retrieval ranking, weighting recently updated documents higher.',
+      'Achieving sub-millisecond latency while computing multiple similarity metrics across large graphs required careful optimization of data structures and algorithms.',
     results:
-      'Reduced time-to-answer for internal technical questions from 25 minutes to under 90 seconds. Adopted by 40+ engineers.',
+      'Sub-millisecond latency for real-time recommendations. Supports multiple similarity metrics for diverse recommendation scenarios.',
     metrics: [
-      '94% answer accuracy on internal benchmarks',
-      '40+ daily active users',
-      '25min → 90sec time-to-answer',
-      '12 knowledge sources integrated',
+      'Sub-millisecond latency',
+      '4 similarity metrics (Cosine, Jaccard, Pearson, Euclidean)',
+      'Real-time graph updates',
+      'Priority-queue traversal for top-K',
     ],
-    techStack: ['Next.js', 'TypeScript', 'LangChain', 'pgvector', 'PostgreSQL', 'OpenAI', 'Redis'],
-    tags: ['AI', 'RAG', 'Next.js', 'TypeScript'],
-    githubUrl: 'https://github.com/alexchen/rag-platform',
-    featured: true,
-    status: 'production',
-    lessonsLearned: 'Semantic search alone is not a silver bullet; indexing freshness, document metadata filtering, and keyword fallbacks (hybrid search) are critical to ensuring user trust in enterprise search.',
-  },
-  {
-    id: 'distributed-task-scheduler',
-    name: 'Distributed Task Scheduler',
-    tagline: 'Fault-tolerant job scheduling with exactly-once semantics',
-    description:
-      'A production-grade distributed task scheduler handling millions of scheduled jobs with guaranteed exactly-once execution, built as an open-source alternative to Temporal for smaller teams.',
-    problem:
-      'Temporal is powerful but operationally complex for small teams. Cron jobs are brittle and invisible. Teams needed reliable background job scheduling without the overhead of a full workflow engine.',
-    solution:
-      'Designed a lightweight scheduler using PostgreSQL advisory locks for distributed coordination, Redis for real-time job state, and a Next.js admin dashboard for visibility.',
-    architecture:
-      'Worker nodes compete for job ownership using PostgreSQL advisory locks. Job state is replicated to Redis for fast status reads. Dead letter queues handle failed jobs. Admin dashboard provides real-time visibility.',
-    challenges:
-      'Ensuring exactly-once semantics across worker failures required careful state machine design and idempotency key management.',
-    results:
-      '3M+ jobs processed per month. Zero duplicate executions in 8 months of production operation.',
-    metrics: [
-      '3M+ jobs/month',
-      '99.97% reliability',
-      '0 duplicate executions in 8 months',
-      '<500ms scheduling latency p99',
-    ],
-    techStack: ['TypeScript', 'Node.js', 'PostgreSQL', 'Redis', 'Next.js', 'Docker'],
-    tags: ['Open Source', 'Node.js', 'TypeScript', 'PostgreSQL'],
-    githubUrl: 'https://github.com/alexchen/dist-scheduler',
+    techStack: ['C++17', 'Graph Algorithms', 'Priority Queues', 'Data Structures'],
+    tags: ['C++', 'Algorithms', 'Machine Learning', 'Graph Theory'],
+    githubUrl: 'https://github.com/MUKULBUROL/GraphBasesRecommendationSystem',
     featured: false,
-    status: 'open-source',
-    lessonsLearned: 'Distributed state management should lean on database primitives (like advisory locks) as long as possible before introducing dedicated orchestration tools, keeping operational overhead low.',
+    status: 'experimental',
+    lessonsLearned: 'Graph-based approaches excel at capturing complex relationships. Multi-metric similarity provides more nuanced recommendations than single-metric approaches.',
   },
 ]

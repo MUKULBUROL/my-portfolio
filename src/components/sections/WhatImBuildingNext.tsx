@@ -8,21 +8,21 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 const NEXT_PROJECTS = [
   {
     index: '01',
-    area: 'Autonomous Agent Orchestration',
-    title: 'Dynamic Routing Graphs',
-    description: 'Experimenting with stateful agent graphs using LangGraph and Python. The goal is to build deterministic state machines that handle complex tool calls, loops, and human-in-the-loop validation gates without prompt drifting.'
+    area: 'Open Source & Community',
+    title: 'Contributing to Open Source',
+    description: 'Actively seeking opportunities to contribute to open source projects. Interested in giving back to the ecosystem that has powered my growth while collaborating with experienced engineers worldwide.'
   },
   {
     index: '02',
-    area: 'Edge Computing & Networking',
-    title: 'Edge-Rendered RAG Systems',
-    description: 'Developing high-performance semantic search workers that run on edge networks (Cloudflare Workers). Investigating WASM-compiled vector search engines to eliminate cold-start latencies and decrease database overhead.'
+    area: 'Web Development',
+    title: 'Production-Ready Websites',
+    description: 'Building and shipping production-grade web applications with a focus on performance, accessibility, and scalable architecture. Every project is an opportunity to refine the craft of delivering real-world solutions.'
   },
   {
     index: '03',
-    area: 'Distributed Systems',
-    title: 'Advisory-Locked Schedulers',
-    description: 'Drafting an open-source distributed scheduler in Go that uses minimal postgres primitives. Aiming to achieve Temporal-like execution safety and status visibility, but with low infrastructure overhead.'
+    area: 'System Design',
+    title: 'Complex Architectures',
+    description: 'Diving deep into complex system architectures — distributed systems, event-driven designs, and microservice patterns — and implementing them to understand trade-offs at a practical level.'
   }
 ]
 
@@ -78,7 +78,7 @@ export function WhatImBuildingNext() {
   }, [])
 
   return (
-    <section id="next-building" className="py-24 relative overflow-hidden bg-[#f5efe8]">
+    <section id="next-building" className="py-24 relative overflow-hidden bg-[#f5efe8]" aria-label="What I'm building next">
       <div className="max-w-5xl mx-auto px-6">
         
         {/* Header */}

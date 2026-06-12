@@ -5,9 +5,9 @@ import { useScrollProgress } from '@/hooks/useScrollProgress'
 import { cn } from '@/lib/utils'
 
 const navItems = [
+  { label: 'Skills', href: '#skills', id: 'skills' },
   { label: 'Selected Work', href: '#selected-work', id: 'selected-work' },
   { label: 'Thinking', href: '#how-i-think', id: 'how-i-think' },
-  { label: 'Journey', href: '#my-journey', id: 'my-journey' },
   { label: 'Next', href: '#next-building', id: 'next-building' },
   { label: 'Connect', href: '#connect', id: 'connect' },
 ]
@@ -29,16 +29,19 @@ export function NavBar() {
         Skip to content
       </a>
 
-      <header className="fixed top-[40px] left-0 w-full z-50 px-6 sm:px-12 md:px-16 pointer-events-none">
+      <header className="navbar fixed top-[40px] left-0 w-full z-50 px-6 sm:px-12 md:px-16 pointer-events-none">
         <div className="max-w-7xl mx-auto flex justify-between items-center pointer-events-auto">
           {/* Logo / Name */}
-          <button
-            onClick={() => scrollTo('hero')}
-            className="font-heading font-black text-xl tracking-tight text-[#111111] hover:opacity-75 transition-opacity cursor-pointer select-none"
-            aria-label="Scroll to top"
+          <a
+            href="/"
+            className="flex items-center gap-3 no-underline hover:opacity-75 transition-opacity"
+            aria-label="Home"
           >
-            ALEX
-          </button>
+            <div className="bg-[#000] text-white w-8 h-8 rounded-lg flex justify-center items-center font-extrabold text-base">
+              M
+            </div>
+            <span className="font-bold text-lg tracking-tight text-[#111111]">MUKUL</span>
+          </a>
 
           {/* Desktop Nav Links */}
           <ul className="hidden md:flex items-center gap-8 font-sans text-xs tracking-wider uppercase font-semibold text-[#6b6b6b]" role="list">
@@ -66,8 +69,13 @@ export function NavBar() {
           </ul>
 
           {/* Availability / Status (Upper right, very subtle) */}
-          <div className="hidden sm:block text-[10px] font-mono tracking-widest uppercase text-[#111111]/60 font-medium select-none">
-            Open for meaningful work.
+          <div className="hidden sm:flex flex-col items-end gap-0.5 select-none">
+            <div className="text-[10px] font-mono tracking-widest uppercase text-[#111111]/60 font-medium">
+              Open for meaningful work.
+            </div>
+            <a href="mailto:mukulburoli@gmail.com" className="text-[10px] font-mono tracking-wider lowercase text-[#111111]/40 hover:text-[#111111]/70 transition-colors duration-300">
+              mukulburoli@gmail.com
+            </a>
           </div>
 
           {/* Mobile hamburger */}
@@ -104,6 +112,11 @@ export function NavBar() {
               ))}
               <li className="pt-2 text-[10px] font-mono tracking-widest text-[#111111]/60">
                 Open for meaningful work.
+              </li>
+              <li>
+                <a href="mailto:mukulburoli@gmail.com" className="text-[10px] font-mono tracking-wider lowercase text-[#111111]/40 hover:text-[#111111]/70 transition-colors duration-300">
+                  mukulburoli@gmail.com
+                </a>
               </li>
             </ul>
           </div>

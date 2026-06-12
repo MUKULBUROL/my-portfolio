@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
  */
 const SECTION_IDS = [
   'hero',
+  'skills',
   'selected-work',
   'pause',
   'how-i-think',

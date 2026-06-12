@@ -6,15 +6,13 @@ import { twMerge } from 'tailwind-merge'
 
 interface MagneticButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode
-  range?: number
-  speed?: number
+  strength?: number
 }
 
 export function MagneticButton({
   children,
   className,
-  range = 35,
-  speed = 0.8,
+  strength = 0.3,
   ...props
 }: MagneticButtonProps) {
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -23,48 +21,47 @@ export function MagneticButton({
     const button = buttonRef.current
     if (!button) return
 
-    // QuickTo for high-performance updates directly mapping to styles
-    const xTo = gsap.quickTo(button, 'x', { duration: speed, ease: 'power3.out' })
-    const yTo = gsap.quickTo(button, 'y', { duration: speed, ease: 'power3.out' })
-
     const handleMouseMove = (e: MouseEvent) => {
-      const { clientX, clientY } = e
       const rect = button.getBoundingClientRect()
-      
-      const x = clientX - (rect.left + rect.width / 2)
-      const y = clientY - (rect.top + rect.height / 2)
+      const x = e.clientX - rect.left - rect.width / 2
+      const y = e.clientY - rect.top - rect.height / 2
 
-      const distance = Math.hypot(x, y)
-      const activeRange = Math.max(rect.width, rect.height) / 2 + range
+      const distance = Math.sqrt(x * x + y * y)
+      const maxDistance = 100
 
-      if (distance < activeRange) {
-        xTo(x * 0.4)
-        yTo(y * 0.4)
-      } else {
-        xTo(0)
-        yTo(0)
+      if (distance < maxDistance) {
+        gsap.to(button, {
+          x: x * strength,
+          y: y * strength,
+          duration: 0.3,
+          ease: 'power2.out',
+        })
       }
     }
 
     const handleMouseLeave = () => {
-      xTo(0)
-      yTo(0)
+      gsap.to(button, {
+        x: 0,
+        y: 0,
+        duration: 0.5,
+        ease: 'elastic.out(1, 0.3)',
+      })
     }
 
-    window.addEventListener('mousemove', handleMouseMove)
+    button.addEventListener('mousemove', handleMouseMove)
     button.addEventListener('mouseleave', handleMouseLeave)
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
+      button.removeEventListener('mousemove', handleMouseMove)
       button.removeEventListener('mouseleave', handleMouseLeave)
     }
-  }, [range, speed])
+  }, [strength])
 
   return (
     <button
       ref={buttonRef}
       className={twMerge(
-        'relative inline-flex items-center justify-center rounded-xl font-medium transition-colors select-none duration-200 focus:outline-none',
+        'relative inline-flex items-center justify-center px-8 py-4 bg-charcoal text-warm-beige rounded-full font-medium transition-all duration-300 hover:shadow-charcoal/20 hover:shadow-lg',
         className
       )}
       {...props}
