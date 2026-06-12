@@ -26,7 +26,7 @@
 
 - **Palette:** Warm beige `#f5efe8` background, charcoal `#111111` text, muted `#6b6b6b` secondary
 - **Theme:** "Creative Studio Editorial" — typography-first, film-grain overlay, organic shapes
-- **Layout:** Full-viewport fluid water shader background + SVG noise grain at 4% opacity
+- **Layout:** Full-viewport fluid water shader background + gradient mesh overlay + SVG noise grain at 4% opacity
 
 ---
 
@@ -34,17 +34,27 @@
 
 ```
 ┌─────────────────────────────────────────────┐
-│  FluidCanvas (fixed GLSL water shader bg)   │
+│  FluidCanvas (GLSL water shader bg)         │
+│    └─ Color palette function for organic    │
+│       color shifts over time                │
+│    └─ Cursor-aware mouse uniforms           │
+│  Gradient Mesh Overlay (3 radial blobs)     │
 │  Film Grain Overlay (SVG noise, 4% opacity) │
 │  NavBar (frosted glass, fixed top)          │
 │  CustomCursor (dot + ring, mix-blend)       │
+│    └─ Dynamic context labels                │
 ├─────────────────────────────────────────────┤
 │  1. Hero                                    │
-│     - Typed name animation (char-by-char)   │
-│     - Rotating gradient border photo        │
+│     - Staggered character reveal (GSAP)     │
+│     - Two-line name: MUKUL / KUMAR          │
+│     - Animated gradient border photo        │
+│     - Floating animation on photo           │
 │     - Tech stack floating icons             │
 │     - 3 CTAs: View Work / Resume / Talk     │
+│     - Magnetic buttons with elastic snap    │
 │     - Availability badge with pulsing dot   │
+│     - Parallax scroll on all elements       │
+│     - Text highlight hover effect           │
 ├────────────────── SVG Divider ──────────────┤
 │  2. Skills                                  │
 │     - 4 categories: Languages, Backend,     │
@@ -56,6 +66,9 @@
 │     - Physical notebook page-flip showcase  │
 │     - 3 projects with SVG architecture      │
 │     - GSAP ScrollTrigger scrub rotation     │
+│     - Hover states with transform/shadow    │
+│     - Glass tech tags on hover              │
+│     - Animated underline on Read Story      │
 ├────────────────── SVG Divider ──────────────┤
 │  4. Pause                                   │
 │     - Typographic interstitial quote        │
@@ -84,9 +97,9 @@
 
 | Component | Purpose |
 |---|---|
-| `Hero` | Landing hero with typed name, photo, tech stack, CTAs |
+| `Hero` | Landing hero with staggered character reveal, parallax scroll, animated gradient photo border, tech stack icons, magnetic CTAs |
 | `Skills` | Skill cards with proficiency bars |
-| `SelectedWork` | Notebook page-flip project showcase |
+| `SelectedWork` | Notebook page-flip project showcase with hover states and glass tech tags |
 | `Pause` | Quiet typographic quote section |
 | `HowIThink` | Interactive SVG architecture diagram |
 | `WhatImBuildingNext` | Ledger-style future goals |
@@ -98,11 +111,11 @@
 | Component | Purpose |
 |---|---|
 | `NavBar` | Fixed frosted-glass nav with active section tracking |
-| `FluidCanvas` | Full-viewport Three.js water shader background |
-| `CustomCursor` | Dot + ring cursor with mix-blend-mode |
-| `MagneticButton` | GSAP-driven magnetic cursor attraction |
+| `FluidCanvas` | Full-viewport Three.js water shader with color palette function and mouse uniforms |
+| `CustomCursor` | Dot + ring cursor with dynamic context labels based on element type |
+| `MagneticButton` | GSAP magnetic attraction with elastic snap-back and configurable strength |
 | `GlassCard` | Glassmorphism card container |
-| `SectionHeader` | Reusable section heading with eyebrow + divider |
+| `SectionHeader` | Scroll-triggered character reveal with animated gradient underline |
 | `InteractiveSVGDivider` | Mouse-following bezier curve divider |
 | `ProjectMinimalVisual` | SVG architecture diagrams per project |
 | `BackgroundAurora` | Dark aurora bg (unused, alternative to FluidCanvas) |
@@ -135,14 +148,38 @@
 
 ## Special Features
 
-### Fluid Water Background
-Custom GLSL fragment shader with cursor-responsive ripples (8 simultaneous), caustic light patterns, warm cream palette.
+### Fluid Water Background with Color Palette
+Custom GLSL fragment shader with `palette()` function for organic color shifts (warm cream, muted brown, deep taupe, warm gray). Cursor-responsive ripples (8 simultaneous), caustic light patterns, `uMouse` uniform for cursor-aware effects.
+
+### Gradient Mesh Overlay
+Fixed overlay with 3 radial gradient blobs (brown, pink-brown, taupe) at 0.4 opacity. Animates with `meshMove` keyframe (translate + scale) for organic background movement.
+
+### Staggered Character Reveal
+Hero name splits into two lines (MUKUL / KUMAR) with each character animating from `opacity: 0, y: 100, rotateX: -90` with 0.05s stagger via GSAP.
+
+### Animated Gradient Border
+Profile photo wrapped with two rotating gradient layers (purple→pink→orange, reversed) using `animate-gradient-xy` classes. Photo floats with 6s ease-in-out animation.
+
+### Hero Parallax
+Scroll-based parallax using GSAP ScrollTrigger: name moves at -80px, photo at -50px, text elements at -30px with different scrub values for layered depth.
 
 ### Book Page-Flip Showcase
-GSAP ScrollTrigger scrub-driven Y-axis rotation on physical notebook pages with spine rings, paper texture, red margin.
+GSAP ScrollTrigger scrub-driven Y-axis rotation on physical notebook pages with spine rings, paper texture, red margin. Hover states with transform/shadow, glass tech tags.
 
-### Custom Cursor
-Dual-element (dot snaps, ring follows with elastic lag), mix-blend-mode difference, expands on hover, text label support.
+### Custom Cursor with Context Labels
+Dual-element (dot snaps, ring follows with elastic lag), mix-blend-mode difference. Dynamic labels based on element type: links → "View", buttons → "Click", inputs → "Type", tech icons → show name, nav links → "Navigate".
+
+### Magnetic Buttons
+GSAP proximity-based cursor attraction with elastic snap-back (`elastic.out(1, 0.3)`). Configurable `strength` prop (default 0.3), 100px activation radius.
+
+### Section Headers
+Scroll-triggered character reveal animation with animated gradient underline (purple → blue) that expands on scroll trigger.
+
+### Project Card Hover States
+Lift + scale on hover with smooth shadow transition. Tech tags with glassmorphism background (blur + translucent white). "Read Story" link with animated purple underline.
+
+### Text Highlight Effect
+Purple underline that grows from 0% to 100% width on hover via `background-size` transition.
 
 ### Sound Effects
 Web Audio API synthesizer (no external files) — intro chime, name-complete tick, role-complete double chime. Mute state persisted in localStorage.
@@ -152,9 +189,6 @@ Fixed SVG noise texture at 4% opacity with 8-step CSS animation.
 
 ### Interactive Dividers
 Mouse-following quadratic bezier curves between every section.
-
-### Magnetic Buttons
-GSAP quickTo proximity-based cursor attraction.
 
 ### Reduced Motion
 Full `prefers-reduced-motion` support — disables Lenis, speeds up GSAP, skips entrance animations.
@@ -219,8 +253,8 @@ New-Portfolio/
 │
 └── src/
     ├── app/
-    │   ├── globals.css         (657 lines — full design system)
-    │   ├── layout.tsx          (Root layout: FluidCanvas + grain + cursor + nav)
+    │   ├── globals.css         (800+ lines — full design system)
+    │   ├── layout.tsx          (Root layout: FluidCanvas + grain + mesh + cursor + nav)
     │   ├── page.tsx            (Home page — section ordering)
     │   ├── providers.tsx       (Lenis + GSAP + ScrollTrigger)
     │   ├── api/contact/route.ts (Resend email API)
@@ -250,5 +284,6 @@ New-Portfolio/
 | Data files | 8 |
 | Custom hooks | 2 |
 | Utility modules | 4 |
-| CSS lines (globals.css) | 657 |
+| CSS lines (globals.css) | 800+ |
 | Dependencies | 14 production, 8 dev |
+| Git version | v1.1 |
