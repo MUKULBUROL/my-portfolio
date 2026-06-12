@@ -176,12 +176,11 @@ export function Hero() {
 
     const textParallax = gsap.to([roleRef.current, descRef.current, techRef.current, ctaRef.current], {
       y: -30,
-      opacity: 0,
       ease: 'none',
       scrollTrigger: {
         trigger: container,
-        start: '30% top',
-        end: '60% top',
+        start: 'top top',
+        end: 'bottom top',
         scrub: 1,
       },
     })
@@ -190,6 +189,9 @@ export function Hero() {
       nameParallax.scrollTrigger?.kill()
       photoParallax.scrollTrigger?.kill()
       textParallax.scrollTrigger?.kill()
+      nameParallax.kill()
+      photoParallax.kill()
+      textParallax.kill()
     }
   }, [prefersReducedMotion])
 
