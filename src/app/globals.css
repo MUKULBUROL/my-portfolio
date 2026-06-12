@@ -815,3 +815,57 @@ html.lenis body {
   display: inline-block;
   transform-origin: center bottom;
 }
+
+/* ============================================================
+   TECH STACK MARQUEE
+   ============================================================ */
+
+@keyframes marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.tech-marquee {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.tech-marquee-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 3rem;
+  animation: marquee-scroll 25s linear infinite;
+  will-change: transform;
+}
+
+.tech-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+.tech-marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0.35;
+  transition: opacity 0.3s ease;
+  flex-shrink: 0;
+}
+
+.tech-marquee-item:hover {
+  opacity: 0.8;
+}
+
+.tech-marquee-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(17, 17, 17, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}

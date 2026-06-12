@@ -20,6 +20,21 @@ const techStack = [
   { name: 'Docker', icon: '🐳' },
 ]
 
+const marqueeItems = [
+  { name: 'React', icon: '⚛️' },
+  { name: 'Next.js', icon: '▲' },
+  { name: 'TypeScript', icon: '📘' },
+  { name: 'Node.js', icon: '🟢' },
+  { name: 'Python', icon: '🐍' },
+  { name: 'Go', icon: '🔵' },
+  { name: 'PostgreSQL', icon: '🐘' },
+  { name: 'Docker', icon: '🐳' },
+  { name: 'AWS', icon: '☁️' },
+  { name: 'Redis', icon: '🔴' },
+  { name: 'GraphQL', icon: '◈' },
+  { name: 'Git', icon: '📦' },
+]
+
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null)
   const nameRef = useRef<HTMLHeadingElement>(null)
@@ -257,23 +272,26 @@ export function Hero() {
             </h2>
           </div>
 
-          <div ref={descRef} className="mb-8 opacity-0">
+          <div ref={descRef} className="mb-6 opacity-0">
             <p className="text-[#6b6b6b] text-base sm:text-lg leading-relaxed font-sans max-w-md">
               High-performance backends, <span className="text-highlight">AI pipelines</span>, and systems that actually work in production.
             </p>
           </div>
 
-          {/* Tech Stack Icons */}
-          <div ref={techRef} className="flex items-center gap-3 mb-10 opacity-0">
-            {techStack.map((tech) => (
-              <div
-                key={tech.name}
-                className="tech-icon"
-                title={tech.name}
-              >
-                <span className="text-lg">{tech.icon}</span>
+          {/* Tech Stack Marquee */}
+          <div ref={techRef} className="w-full max-w-md mb-10 opacity-0">
+            <div className="tech-marquee">
+              <div className="tech-marquee-track">
+                {[...marqueeItems, ...marqueeItems].map((tech, i) => (
+                  <div key={`${tech.name}-${i}`} className="tech-marquee-item">
+                    <div className="tech-marquee-icon">
+                      <span>{tech.icon}</span>
+                    </div>
+                    <span className="text-[11px] font-mono text-[#111111] tracking-wide">{tech.name}</span>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
 
           {/* CTA Buttons */}
