@@ -63,7 +63,6 @@ export function SelectedWork({ initialProjects }: SelectedWorkProps) {
     // Animate each page flip in sequence
     pages.forEach((page, i) => {
       const progress = i / pages.length          // when this flip starts
-      const end      = (i + 1) / pages.length   // when this flip ends
 
       master.fromTo(
         page,
@@ -123,7 +122,7 @@ export function SelectedWork({ initialProjects }: SelectedWorkProps) {
       {/* Section heading */}
       <div className="absolute top-14 left-1/2 -translate-x-1/2 text-center z-20 select-none pointer-events-none">
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-heading font-black tracking-tight text-[#111111]">
-          Systems I've Built
+          Systems I&apos;ve Built
         </h2>
         <p className="mt-2 text-xs sm:text-sm text-[#6b6b6b] font-sans max-w-md mx-auto">
           High-performance backends, AI pipelines, and scalable architectures — from hackathons to production.

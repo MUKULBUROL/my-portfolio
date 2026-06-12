@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
@@ -149,12 +149,12 @@ function WaterPlane() {
     return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
 
-  const uniformsRef = useRef({
+  const uniforms = useMemo(() => ({
     u_time: { value: 0 },
     u_resolution: { value: new THREE.Vector2(1920, 1080) },
     u_ripples: { value: Array(8).fill(null).map(() => new THREE.Vector3(0, 0, 0)) },
     uMouse: { value: new THREE.Vector2(0.5, 0.5) },
-  })
+  }), [])
 
   useFrame((state, delta) => {
     if (!materialRef.current) return
@@ -178,7 +178,7 @@ function WaterPlane() {
         ref={materialRef}
         vertexShader={vertexShader}
         fragmentShader={fragmentShader}
-        uniforms={uniformsRef.current}
+        uniforms={uniforms}
         transparent={false}
       />
     </mesh>

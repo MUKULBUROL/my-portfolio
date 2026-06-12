@@ -100,7 +100,7 @@ export function WhatImBuildingNext() {
             >
               {/* Meta information */}
               <div className="md:col-span-4 flex flex-col">
-                <span className="font-mono text-[9px] text-[#6b6b6b] uppercase tracking-widest mb-1.5">// Area: {item.area}</span>
+                <span className="font-mono text-[9px] text-[#6b6b6b] uppercase tracking-widest mb-1.5">Area: {item.area}</span>
                 <div className="flex items-baseline gap-2">
                   <span className="font-mono text-xs font-bold text-[#111111]">{item.index}</span>
                   <h3 className="text-lg font-heading font-black text-[#111111] tracking-tight">{item.title}</h3>

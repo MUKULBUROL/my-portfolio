@@ -11,15 +11,6 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const techStack = [
-  { name: 'React', icon: '⚛️' },
-  { name: 'Node.js', icon: '🟢' },
-  { name: 'Python', icon: '🐍' },
-  { name: 'TypeScript', icon: '📘' },
-  { name: 'Go', icon: '🔵' },
-  { name: 'Docker', icon: '🐳' },
-]
-
 const marqueeItems = [
   { name: 'React', icon: '⚛️' },
   { name: 'Next.js', icon: '▲' },
@@ -295,7 +286,7 @@ export function Hero() {
           </div>
 
           {/* CTA Buttons */}
-          <div ref={ctaRef} className="flex items-center gap-4 opacity-0">
+          <div ref={ctaRef} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 opacity-0">
             <MagneticButton
               onClick={() => scrollToSection('skills')}
               className="cta-button px-8 py-4 bg-[#111111] hover:bg-[#222222] text-[#f5efe8] rounded-full text-xs font-mono font-semibold tracking-wide flex items-center justify-center gap-2 group"
@@ -309,7 +300,7 @@ export function Hero() {
               href="/resume.pdf"
               target="_blank"
               rel="noopener noreferrer"
-              className="cta-button-outline px-6 py-4 border border-[#111111]/20 hover:border-[#111111] text-[#111111] rounded-full text-xs font-mono font-semibold tracking-wide flex items-center justify-center gap-2"
+              className="cta-button-outline px-6 py-4 border-2 border-[#111111] hover:bg-[#111111] hover:text-[#f5efe8] text-[#111111] rounded-full text-xs font-mono font-semibold tracking-wide flex items-center justify-center gap-2"
             >
               <Download size={12} />
               <span>Resume</span>
@@ -317,11 +308,11 @@ export function Hero() {
 
             <MagneticButton
               onClick={() => scrollToSection('connect')}
-              className="cta-button-outline px-6 py-4 border border-[#111111]/20 hover:border-[#111111] text-[#111111] rounded-full text-xs font-mono font-semibold tracking-wide flex items-center justify-center gap-2"
+              className="cta-button-outline px-6 py-4 border-2 border-[#111111] hover:bg-[#111111] hover:text-[#f5efe8] text-[#111111] rounded-full text-xs font-mono font-semibold tracking-wide flex items-center justify-center gap-2"
               aria-label="Let's talk"
             >
               <Mail size={12} />
-              <span>Let's Talk</span>
+              <span>Let&apos;s Talk</span>
             </MagneticButton>
           </div>
         </div>
@@ -339,12 +330,12 @@ export function Hero() {
             <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600 animate-gradient-xy-reverse opacity-60" />
             
             {/* Photo frame — circular with border */}
-            <div className="relative w-56 h-56 sm:w-72 sm:h-72 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-warm-beige shadow-2xl animate-float">
+            <div className="relative w-48 h-48 sm:w-72 sm:h-72 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-warm-beige shadow-2xl animate-float">
               <Image
                 src="/Profile.jpg"
                 alt={`${profile.name} — ${profile.headline}`}
                 fill
-                sizes="(max-width: 640px) 224px, (max-width: 768px) 288px, 320px"
+                sizes="(max-width: 640px) 192px, (max-width: 768px) 288px, 320px"
                 className="object-cover object-center"
                 priority
               />

@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
+import Link from 'next/link'
 import { useScrollProgress } from '@/hooks/useScrollProgress'
 import { cn } from '@/lib/utils'
 
@@ -32,7 +33,7 @@ export function NavBar() {
       <header className="navbar fixed top-[40px] left-0 w-full z-50 px-6 sm:px-12 md:px-16 pointer-events-none">
         <div className="max-w-7xl mx-auto flex justify-between items-center pointer-events-auto">
           {/* Logo / Name */}
-          <a
+          <Link
             href="/"
             className="flex items-center gap-3 no-underline hover:opacity-75 transition-opacity"
             aria-label="Home"
@@ -41,7 +42,7 @@ export function NavBar() {
               M
             </div>
             <span className="font-bold text-lg tracking-tight text-[#111111]">MUKUL</span>
-          </a>
+          </Link>
 
           {/* Desktop Nav Links */}
           <ul className="hidden md:flex items-center gap-8 font-sans text-xs tracking-wider uppercase font-semibold text-[#6b6b6b]" role="list">

@@ -25,14 +25,10 @@ export function SectionHeader({
   align = 'left',
 }: SectionHeaderProps) {
   const titleRef = useRef<HTMLHeadingElement>(null)
-  const underlineRef = useRef<HTMLDivElement>(null)
-  const bgRef = useRef<HTMLSpanElement>(null)
   const [isActive, setIsActive] = useState(false)
 
   useEffect(() => {
     const titleEl = titleRef.current
-    const underlineEl = underlineRef.current
-    const bgEl = bgRef.current
     if (!titleEl) return
 
     // Split title into characters for reveal

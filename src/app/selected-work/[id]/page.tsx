@@ -135,7 +135,7 @@ export default function ProjectPage() {
                 <div className="p-5 border-l border-[#111111]/15 bg-[#111111]/2 rounded-r-xl">
                   <span className="font-mono text-[9px] uppercase tracking-wider text-[#111111] block mb-1">Lesson Learned</span>
                   <p className="text-xs text-[#6b6b6b] leading-relaxed font-sans italic">
-                    "{project.lessonsLearned}"
+                    &quot;{project.lessonsLearned}&quot;
                   </p>
                 </div>
               )}
@@ -150,7 +150,7 @@ export default function ProjectPage() {
             {project.metrics && project.metrics.length > 0 && (
               <div className="p-6 border border-[#111111]/8 rounded-2xl bg-[#fcfaf7]">
                 <h3 className="text-[9px] font-mono uppercase text-[#6b6b6b] tracking-widest mb-4 font-bold border-b border-[#111111]/5 pb-2">
-                  // Metrics & Performance
+                  Metrics &amp; Performance
                 </h3>
                 <ul className="flex flex-col gap-3">
                   {project.metrics.map((metric, i) => (
@@ -166,7 +166,7 @@ export default function ProjectPage() {
             {/* Tech Stack */}
             <div className="p-6 border border-[#111111]/8 rounded-2xl bg-[#fcfaf7]">
               <h3 className="text-[9px] font-mono uppercase text-[#6b6b6b] tracking-widest mb-4 font-bold border-b border-[#111111]/5 pb-2">
-                // System Components
+                System Components
               </h3>
               <div className="flex flex-wrap gap-1.5">
                 {project.techStack.map((tech) => (
