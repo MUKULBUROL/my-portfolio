@@ -725,3 +725,93 @@ html.lenis body {
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }
+
+/* ============================================================
+   PROJECT CARD — Hover States
+   ============================================================ */
+
+.project-card {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 20px 60px rgba(100, 80, 50, 0.15), 0 8px 24px rgba(100, 80, 50, 0.1);
+}
+
+.project-card .tech-tag {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  transition: all 0.2s ease;
+}
+
+.project-card:hover .tech-tag {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(139, 92, 246, 0.2);
+}
+
+.project-card .read-story {
+  position: relative;
+  overflow: hidden;
+}
+
+.project-card .read-story::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 1.5px;
+  background: #7C3AED;
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.project-card:hover .read-story::after {
+  width: 100%;
+}
+
+/* ============================================================
+   SECTION HEADER — Animated Underline
+   ============================================================ */
+
+.section-header-underline {
+  position: relative;
+  display: inline-block;
+}
+
+.section-header-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #7C3AED, #3B82F6);
+  border-radius: 2px;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.section-header-underline.active::after {
+  width: 100%;
+}
+
+.section-header-bg {
+  background: linear-gradient(120deg, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  transition: background-size 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0 8px;
+  border-radius: 4px;
+}
+
+.section-header-bg.active {
+  background-size: 100% 100%;
+}
+
+/* Section header character animation */
+.section-char {
+  display: inline-block;
+  transform-origin: center bottom;
+}

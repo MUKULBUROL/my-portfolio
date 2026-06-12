@@ -224,7 +224,7 @@ export function SelectedWork({ initialProjects }: SelectedWorkProps) {
             >
               {/* ── FRONT FACE (current project) ── */}
               <div
-                className="page-face page-front absolute inset-0 flex overflow-hidden"
+                className="page-face page-front absolute inset-0 flex overflow-hidden project-card"
                 style={{
                   backfaceVisibility: 'hidden',
                   WebkitBackfaceVisibility: 'hidden',
@@ -294,7 +294,7 @@ export function SelectedWork({ initialProjects }: SelectedWorkProps) {
                       {project.techStack.slice(0, 4).map((tech) => (
                         <span
                           key={tech}
-                          className="text-[9px] font-mono bg-[#111111]/6 border border-[#111111]/10 px-1.5 py-0.5 rounded text-[#111111]/70"
+                          className="tech-tag text-[9px] font-mono px-2 py-0.5 rounded-full text-[#111111]/70"
                         >
                           {tech}
                         </span>
@@ -303,7 +303,7 @@ export function SelectedWork({ initialProjects }: SelectedWorkProps) {
 
                     <Link
                       href={`/selected-work/${project.id}`}
-                      className="mt-2 self-start text-[10px] font-mono font-bold uppercase tracking-wider text-[#111111] border-b border-[#111111] pb-0.5 hover:opacity-60 transition-opacity"
+                      className="read-story mt-2 self-start text-[10px] font-mono font-bold uppercase tracking-wider text-[#111111] pb-0.5 hover:text-[#7C3AED] transition-colors"
                     >
                       Read Story →
                     </Link>
