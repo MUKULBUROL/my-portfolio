@@ -53,10 +53,10 @@ const fragmentShader = `
 
   // Color palette for organic shifts
   vec3 palette(float t) {
-    vec3 a_light = vec3(0.96, 0.94, 0.92);   // Warm cream base
-    vec3 b_light = vec3(0.75, 0.68, 0.62);   // Muted brown
-    vec3 c_light = vec3(0.47, 0.42, 0.38);   // Deep taupe
-    vec3 d_light = vec3(0.68, 0.61, 0.55);   // Warm gray
+    vec3 a_light = vec3(0.97, 0.955, 0.94);   // Very light warm cream base
+    vec3 b_light = vec3(0.015, 0.015, 0.025); // Extremely small variance to keep it light
+    vec3 c_light = vec3(0.2, 0.2, 0.2);       // Smooth transition
+    vec3 d_light = vec3(0.8, 0.8, 0.8);       // Warm offsets
 
     vec3 a_dark = vec3(0.086, 0.078, 0.07);  // Warm deep charcoal base (#161412)
     vec3 b_dark = vec3(0.12, 0.11, 0.10);    // Warm gray-brown
