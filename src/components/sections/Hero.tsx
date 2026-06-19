@@ -163,11 +163,11 @@ export function Hero() {
           {/* Role Banner: SOFTWARE ENGINEER + ───────────── ◦ */}
           <div
             ref={roleRef}
-            className="flex items-center gap-3 text-[#b58953] dark:text-[#d4b483] font-sans text-xs uppercase tracking-[0.25em] mb-6 select-none w-full opacity-0"
+            className="flex items-center gap-3 text-[#966d3a] dark:text-[#d4b483] font-sans text-xs uppercase tracking-[0.25em] mb-6 select-none w-full opacity-0"
           >
             <span className="font-semibold">Software Engineer</span>
             <span className="opacity-45">+</span>
-            <div className="flex-1 max-w-[120px] sm:max-w-[180px] h-[1px] bg-[#b58953]/25 dark:bg-[#d4b483]/25" />
+            <div className="flex-1 max-w-[120px] sm:max-w-[180px] h-[1px] bg-[#966d3a]/25 dark:bg-[#d4b483]/25" />
             <span className="text-[8px] sm:text-[10px]">◦</span>
           </div>
 
@@ -182,7 +182,7 @@ export function Hero() {
             </span>
             <span className="block overflow-hidden py-1">
               <span className="inline-block title-word font-normal">that</span>{' '}
-              <span className="inline-block title-word font-serif italic font-normal text-[#b58953] dark:text-[#d4b483]">survives</span>
+              <span className="inline-block title-word font-serif italic font-normal text-[#966d3a] dark:text-[#d4b483]">survives</span>
             </span>
             <span className="block overflow-hidden py-1">
               <span className="inline-block title-word">production.</span>
@@ -195,13 +195,13 @@ export function Hero() {
             className="w-full flex items-center gap-4 mb-8 opacity-0"
           >
             <div className="flex-1 h-[1px] bg-[#111111]/10 dark:bg-[#e5ded4]/10" />
-            <span className="text-[#b58953] dark:text-[#d4b483] font-mono text-xs font-semibold">+</span>
+            <span className="text-[#966d3a] dark:text-[#d4b483] font-mono text-xs font-semibold">+</span>
           </div>
 
           {/* Updated Description */}
           <div ref={descRef} className="mb-8 opacity-0">
             <p className="text-[#111111]/80 dark:text-[#e5ded4]/80 font-normal text-base sm:text-lg leading-relaxed font-sans max-w-lg">
-              I build high-performance systems, <span className="text-[#b58953] dark:text-[#d4b483] font-semibold">AI pipelines</span>, and infrastructure that power real products.
+              I build high-performance systems, <span className="text-[#966d3a] dark:text-[#d4b483] font-semibold">AI pipelines</span>, and infrastructure that power real products.
             </p>
           </div>
 
@@ -217,7 +217,7 @@ export function Hero() {
               </div>
               <div className="flex flex-col">
                 <span className="font-sans font-semibold text-sm text-[#111111] dark:text-[#e5ded4]">Software Engineer</span>
-                <span className="font-sans text-xs text-[#6b6b6b] dark:text-[#a69e96]">IIT Hyderabad &apos;26</span>
+                <span className="font-sans text-xs text-[#555555] dark:text-[#cccccc]">IIT Hyderabad &apos;26</span>
               </div>
             </div>
 
@@ -231,8 +231,8 @@ export function Hero() {
               </div>
               <div className="flex flex-col">
                 <span className="font-sans font-semibold text-sm text-[#111111] dark:text-[#e5ded4]">Based in India</span>
-                <span className="font-serif italic text-xs text-[#b58953] dark:text-[#d4b483]">Open for meaningful work.</span>
-                <span className="font-sans text-[10px] text-[#6b6b6b] dark:text-[#a69e96] mt-0.5">mukulburoli@gmail.com</span>
+                <span className="font-serif italic text-xs text-[#966d3a] dark:text-[#d4b483]">Open for meaningful work.</span>
+                <span className="font-sans text-[10px] text-[#555555] dark:text-[#cccccc] mt-0.5">mukulburoli@gmail.com</span>
               </div>
             </div>
           </div>

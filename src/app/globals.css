@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ============================================================
    CREATIVE STUDIO EDITORIAL — Design Tokens
    Warm beige and charcoal typography-first system

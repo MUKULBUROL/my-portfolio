@@ -46,7 +46,7 @@ export function NavBar() {
           </Link>
 
           {/* Desktop Nav Links */}
-          <ul className="hidden md:flex items-center gap-8 font-sans text-xs tracking-wider uppercase font-semibold text-[#6b6b6b] dark:text-[#a69e96]" role="list">
+          <ul className="hidden md:flex items-center gap-8 font-sans text-xs tracking-wider uppercase font-semibold text-[#555555] dark:text-[#cccccc]" role="list">
             {navItems.map((item) => {
               const isActive = activeSection === item.id
               return (
@@ -55,7 +55,7 @@ export function NavBar() {
                     onClick={() => scrollTo(item.id)}
                     className={cn(
                       'nav-link transition-colors duration-300 hover:text-[#111111] dark:hover:text-[#e5ded4] focus-visible:outline-none cursor-pointer',
-                      isActive ? 'text-[#111111] dark:text-[#e5ded4] font-bold' : 'text-[#6b6b6b] dark:text-[#a69e96]'
+                      isActive ? 'text-[#111111] dark:text-[#e5ded4] font-bold' : 'text-[#555555] dark:text-[#cccccc]'
                     )}
                     aria-current={isActive ? 'page' : undefined}
                   >
@@ -75,7 +75,7 @@ export function NavBar() {
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
-              className="p-2 text-[#6b6b6b] hover:text-[#111111] dark:text-[#a69e96] dark:hover:text-[#e5ded4] transition-colors cursor-pointer"
+              className="p-2 text-[#555555] hover:text-[#111111] dark:text-[#cccccc] dark:hover:text-[#e5ded4] transition-colors cursor-pointer"
               aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
               data-cursor-label="Theme"
             >
@@ -88,17 +88,17 @@ export function NavBar() {
 
             {/* Availability / Status (Upper right, very subtle) */}
             <div className="hidden sm:flex flex-col items-end gap-0.5 select-none">
-              <div className="text-[10px] font-mono tracking-widest uppercase text-[#111111]/60 dark:text-[#e5ded4]/60 font-medium">
+              <div className="text-[10px] font-mono tracking-widest uppercase text-[#111111]/75 dark:text-[#e5ded4]/80 font-medium">
                 Open for meaningful work.
               </div>
-              <a href="mailto:mukulburoli@gmail.com" className="text-[10px] font-mono tracking-wider lowercase text-[#111111]/40 hover:text-[#111111]/70 dark:text-[#e5ded4]/40 dark:hover:text-[#e5ded4]/70 transition-colors duration-300">
+              <a href="mailto:mukulburoli@gmail.com" className="text-[10px] font-mono tracking-wider lowercase text-[#111111]/60 hover:text-[#111111]/90 dark:text-[#e5ded4]/65 dark:hover:text-[#e5ded4]/90 transition-colors duration-300">
                 mukulburoli@gmail.com
               </a>
             </div>
 
             {/* Mobile hamburger */}
             <button
-              className="md:hidden p-2 text-[#6b6b6b] hover:text-[#111111] dark:text-[#a69e96] dark:hover:text-[#e5ded4] transition-all cursor-pointer"
+              className="md:hidden p-2 text-[#555555] hover:text-[#111111] dark:text-[#cccccc] dark:hover:text-[#e5ded4] transition-all cursor-pointer"
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label={menuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={menuOpen}
@@ -115,25 +115,25 @@ export function NavBar() {
         {/* Mobile Menu (Minimal overlay layout) */}
         {menuOpen && (
           <div className="md:hidden absolute top-[50px] left-6 right-6 bg-[#fcfaf7] dark:bg-[#1e1b19] border border-[#111111]/10 dark:border-[#e5ded4]/10 rounded-xl p-4 shadow-lg pointer-events-auto">
-            <ul className="flex flex-col gap-4 font-sans text-xs tracking-wider uppercase font-semibold text-[#6b6b6b] dark:text-[#a69e96]" role="list">
+            <ul className="flex flex-col gap-4 font-sans text-xs tracking-wider uppercase font-semibold text-[#555555] dark:text-[#cccccc]" role="list">
               {navItems.map((item) => (
                 <li key={item.id}>
                   <button
                     onClick={() => scrollTo(item.id)}
                     className={cn(
                       'w-full text-left py-2 border-b border-[#111111]/5 dark:border-[#e5ded4]/5 transition-all',
-                      activeSection === item.id ? 'text-[#111111] dark:text-[#e5ded4] font-bold' : 'text-[#6b6b6b] dark:text-[#a69e96]'
+                      activeSection === item.id ? 'text-[#111111] dark:text-[#e5ded4] font-bold' : 'text-[#555555] dark:text-[#cccccc]'
                     )}
                   >
                     {item.label}
                   </button>
                 </li>
               ))}
-              <li className="pt-2 text-[10px] font-mono tracking-widest text-[#111111]/60 dark:text-[#e5ded4]/60">
+              <li className="pt-2 text-[10px] font-mono tracking-widest text-[#111111]/75 dark:text-[#e5ded4]/80">
                 Open for meaningful work.
               </li>
               <li>
-                <a href="mailto:mukulburoli@gmail.com" className="text-[10px] font-mono tracking-wider lowercase text-[#111111]/40 hover:text-[#111111]/70 dark:text-[#e5ded4]/40 dark:hover:text-[#e5ded4]/70 transition-colors duration-300">
+                <a href="mailto:mukulburoli@gmail.com" className="text-[10px] font-mono tracking-wider lowercase text-[#111111]/60 hover:text-[#111111]/90 dark:text-[#e5ded4]/65 dark:hover:text-[#e5ded4]/90 transition-colors duration-300">
                   mukulburoli@gmail.com
                 </a>
               </li>
