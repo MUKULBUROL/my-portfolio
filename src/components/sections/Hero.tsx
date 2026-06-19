@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { MagneticButton } from '../ui/MagneticButton'
-import { ArrowRight, ChevronDown, Download, Mail } from 'lucide-react'
+import { ArrowRight, ChevronDown, Download, Mail, GraduationCap, MapPin } from 'lucide-react'
 import { profile } from '@/data/profile'
 import { resume } from '@/data/resume'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -16,128 +16,72 @@ gsap.registerPlugin(ScrollTrigger)
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null)
   const nameRef = useRef<HTMLHeadingElement>(null)
-  const subtitleRef = useRef<HTMLHeadingElement>(null)
-  const underlineRef = useRef<SVGPathElement>(null)
+  const underlineRef = useRef<HTMLDivElement>(null)
   const roleRef = useRef<HTMLDivElement>(null)
   const descRef = useRef<HTMLDivElement>(null)
   const techRef = useRef<HTMLDivElement>(null)
   const ctaRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const photoRef = useRef<HTMLDivElement>(null)
+  const metadataRef = useRef<HTMLDivElement>(null)
   const prefersReducedMotion = useReducedMotion()
-  const fullName = profile.name.toUpperCase()
 
   useEffect(() => {
-    const nameEl = nameRef.current
-    if (!nameEl) return
-
     if (prefersReducedMotion) {
-      nameEl.innerHTML = fullName.split('').map(char =>
-        char === ' ' ? '<span class="char-space"> </span>' : `<span class="char">${char}</span>`
-      ).join('')
-      if (subtitleRef.current) gsap.set(subtitleRef.current, { opacity: 1, y: 0 })
+      const els = [
+        photoRef.current,
+        roleRef.current,
+        nameRef.current,
+        underlineRef.current,
+        descRef.current,
+        metadataRef.current,
+        techRef.current,
+        ctaRef.current,
+        scrollRef.current,
+      ]
+      els.forEach((el) => { if (el) gsap.set(el, { opacity: 1, y: 0 }) })
+      gsap.set('.title-word', { y: '0%' })
       return
     }
 
     const ctx = gsap.context(() => {
-      // Split name into two lines: MUKUL and KUMAR
-      const firstName = 'MUKUL'
-      const lastName = 'KUMAR'
-      
-      nameEl.innerHTML = `
-        <span class="block">${firstName.split('').map(char =>
-          `<span class="char">${char}</span>`
-        ).join('')}</span>
-        <span class="block">${lastName.split('').map(char =>
-          `<span class="char">${char}</span>`
-        ).join('')}</span>
-      `
+      // Set initial states
+      gsap.set(roleRef.current, { y: 15, opacity: 0 })
+      gsap.set('.title-word', { y: '100%' })
+      if (underlineRef.current) gsap.set(underlineRef.current, { scaleX: 0, opacity: 0 })
+      gsap.set(descRef.current, { y: 15, opacity: 0 })
+      gsap.set(metadataRef.current, { y: 15, opacity: 0 })
+      gsap.set(techRef.current, { y: 15, opacity: 0 })
+      gsap.set(ctaRef.current, { y: 15, opacity: 0 })
+      gsap.set(scrollRef.current, { opacity: 0 })
 
-      // Animate characters
-      gsap.from('.char', {
-        opacity: 0,
-        y: 100,
-        rotateX: -90,
-        stagger: 0.05,
-        duration: 0.8,
-        ease: 'power3.out',
-        delay: 0.5,
-      })
+      // Sequenced reveal timeline
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
-      // Fade in subtitle
-      gsap.from(subtitleRef.current, {
-        opacity: 0,
-        y: 30,
-        duration: 1,
-        delay: 2.5,
-        ease: 'power3.out',
-      })
+      tl.fromTo(photoRef.current, { opacity: 0, scale: 0.88 }, { opacity: 1, scale: 1, duration: 0.8 })
+        .to(roleRef.current, { y: 0, opacity: 1, duration: 0.4 }, '-=0.3')
+        .to('.title-word', { y: '0%', duration: 0.8, stagger: 0.08, ease: 'power4.out' }, '-=0.2')
+        .to(underlineRef.current, { scaleX: 1, opacity: 1, transformOrigin: 'left center', duration: 0.8, ease: 'power2.inOut' }, '-=0.2')
+        .to(descRef.current, { y: 0, opacity: 1, duration: 0.4 }, '-=0.3')
+        .to(metadataRef.current, { y: 0, opacity: 1, duration: 0.4 }, '-=0.3')
+        .to(techRef.current, { y: 0, opacity: 1, duration: 0.4 }, '-=0.2')
+        .to(ctaRef.current, { y: 0, opacity: 1, duration: 0.4 }, '-=0.2')
+        .to(scrollRef.current, { opacity: 1, duration: 0.3 }, '-=0.1')
+
+      // Gentle floating animation on photo — continuous
+      if (photoRef.current) {
+        gsap.to(photoRef.current, {
+          y: -12,
+          duration: 3.2,
+          ease: 'sine.inOut',
+          yoyo: true,
+          repeat: -1,
+          delay: 0.9,
+        })
+      }
     })
 
     return () => ctx.revert()
-  }, [fullName, prefersReducedMotion])
-
-  useEffect(() => {
-    const els = [
-      photoRef.current,
-      roleRef.current,
-      descRef.current,
-      techRef.current,
-      ctaRef.current,
-      scrollRef.current,
-    ]
-
-    if (prefersReducedMotion) {
-      els.forEach((el) => { if (el) gsap.set(el, { opacity: 1, y: 0 }) })
-      if (underlineRef.current) {
-        gsap.set(underlineRef.current, { strokeDashoffset: 0 })
-      }
-      return
-    }
-
-    // Set up underline length
-    const underlineEl = underlineRef.current
-    if (underlineEl) {
-      const length = underlineEl.getTotalLength()
-      gsap.set(underlineEl, { strokeDasharray: length, strokeDashoffset: length })
-    }
-
-    // Sequenced reveal timeline
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
-
-    tl.fromTo(photoRef.current, { opacity: 0, scale: 0.88 }, { opacity: 1, scale: 1, duration: 0.8 })
-      
-    if (underlineEl) {
-      tl.to(underlineEl, {
-        strokeDashoffset: 0,
-        duration: 1.2,
-        ease: 'power2.inOut',
-      }, '+=1.5')
-    }
-
-    tl.fromTo(roleRef.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4 }, '-=0.3')
-      .fromTo(descRef.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4 }, '-=0.3')
-      .fromTo(techRef.current, { y: 15, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4 }, '-=0.2')
-      .fromTo(ctaRef.current, { y: 15, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4 }, '-=0.2')
-      .fromTo(scrollRef.current, { opacity: 0 }, { opacity: 1, duration: 0.3 }, '-=0.1')
-
-    // Gentle floating animation on photo — continuous
-    let floatTween: gsap.core.Tween | null = null
-    if (photoRef.current) {
-      floatTween = gsap.to(photoRef.current, {
-        y: -12,
-        duration: 3.2,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: -1,
-        delay: 0.9,
-      })
-    }
-
-    return () => {
-      tl.kill()
-      floatTween?.kill()
-    }
   }, [prefersReducedMotion])
 
   useEffect(() => {
@@ -167,7 +111,7 @@ export function Hero() {
       },
     })
 
-    const textParallax = gsap.to([roleRef.current, descRef.current, techRef.current, ctaRef.current], {
+    const textParallax = gsap.to([roleRef.current, descRef.current, techRef.current, ctaRef.current, metadataRef.current], {
       y: -30,
       ease: 'none',
       scrollTrigger: {
@@ -216,43 +160,81 @@ export function Hero() {
         {/* ── Left column: text ── */}
         <div className="flex flex-col items-start text-left select-none flex-1 order-2 md:order-1">
 
-          {/* Name container with underline */}
-          <div className="relative mb-14 sm:mb-16">
-            {/* Name with staggered character reveal */}
-            <h1
-              ref={nameRef}
-              className="text-5xl sm:text-7xl md:text-8xl font-heading font-black tracking-tight leading-[0.95] text-[#111111] select-none"
-            />
-
-            {/* Creative hand-drawn accent line SVG */}
-            <svg
-              className="absolute left-0 -bottom-6 w-[160px] sm:w-[220px] md:w-[280px] h-[20px] pointer-events-none"
-              viewBox="0 0 280 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                ref={underlineRef}
-                d="M 6 8 C 65 14, 185 2, 274 10 C 210 13, 110 16, 40 12 C 120 10, 205 7, 260 12"
-                stroke="#7C3AED"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+          {/* Role Banner: SOFTWARE ENGINEER + ───────────── ◦ */}
+          <div
+            ref={roleRef}
+            className="flex items-center gap-3 text-[#b58953] dark:text-[#d4b483] font-sans text-xs uppercase tracking-[0.25em] mb-6 select-none w-full opacity-0"
+          >
+            <span className="font-semibold">Software Engineer</span>
+            <span className="opacity-45">+</span>
+            <div className="flex-1 max-w-[120px] sm:max-w-[180px] h-[1px] bg-[#b58953]/25 dark:bg-[#d4b483]/25" />
+            <span className="text-[8px] sm:text-[10px]">◦</span>
           </div>
 
-          {/* Role + description */}
-          <div ref={roleRef} className="mb-4 opacity-0">
-            <h2 ref={subtitleRef} className="font-sans text-lg sm:text-xl md:text-2xl font-bold text-[#111111]/85 tracking-wide opacity-0">
-              {profile.headline}
-            </h2>
+          {/* Title: Building software that survives production. */}
+          <h1
+            ref={nameRef}
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-sans font-bold tracking-tight leading-[1.1] text-[#111111] dark:text-[#e5ded4] select-none mb-6"
+          >
+            <span className="block overflow-hidden py-1">
+              <span className="inline-block title-word">Building</span>{' '}
+              <span className="inline-block title-word">software</span>
+            </span>
+            <span className="block overflow-hidden py-1">
+              <span className="inline-block title-word font-normal">that</span>{' '}
+              <span className="inline-block title-word font-serif italic font-normal text-[#b58953] dark:text-[#d4b483]">survives</span>
+            </span>
+            <span className="block overflow-hidden py-1">
+              <span className="inline-block title-word">production.</span>
+            </span>
+          </h1>
+
+          {/* Divider Line: ───────────────────────────────── + */}
+          <div
+            ref={underlineRef}
+            className="w-full flex items-center gap-4 mb-8 opacity-0"
+          >
+            <div className="flex-1 h-[1px] bg-[#111111]/10 dark:bg-[#e5ded4]/10" />
+            <span className="text-[#b58953] dark:text-[#d4b483] font-mono text-xs font-semibold">+</span>
           </div>
 
-          <div ref={descRef} className="mb-6 opacity-0">
-            <p className="text-[#111111]/85 font-medium text-base sm:text-lg leading-relaxed font-sans max-w-md">
-              High-performance backends, <span className="text-highlight font-bold text-[#7C3AED]">AI pipelines</span>, and systems that actually work in production.
+          {/* Updated Description */}
+          <div ref={descRef} className="mb-8 opacity-0">
+            <p className="text-[#111111]/80 dark:text-[#e5ded4]/80 font-normal text-base sm:text-lg leading-relaxed font-sans max-w-lg">
+              I build high-performance systems, <span className="text-[#b58953] dark:text-[#d4b483] font-semibold">AI pipelines</span>, and infrastructure that power real products.
             </p>
+          </div>
+
+          {/* Metadata Cards */}
+          <div
+            ref={metadataRef}
+            className="flex flex-col sm:flex-row items-stretch sm:items-center gap-6 sm:gap-8 mb-10 opacity-0 w-full"
+          >
+            {/* Card 1: Education */}
+            <div className="flex items-center gap-4 flex-1">
+              <div className="flex-shrink-0 w-11 h-11 rounded-full border border-[#111111]/8 dark:border-[#e5ded4]/12 bg-[#fcfaf7]/50 dark:bg-[#1e1b19]/50 flex items-center justify-center text-[#111111] dark:text-[#e5ded4] shadow-sm">
+                <GraduationCap size={18} className="stroke-[1.5]" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-sans font-semibold text-sm text-[#111111] dark:text-[#e5ded4]">Software Engineer</span>
+                <span className="font-sans text-xs text-[#6b6b6b] dark:text-[#a69e96]">IIT Hyderabad &apos;26</span>
+              </div>
+            </div>
+
+            {/* Vertical Separator */}
+            <div className="hidden sm:block w-[1px] h-8 bg-[#111111]/10 dark:bg-[#e5ded4]/15" />
+
+            {/* Card 2: Location & Availability */}
+            <div className="flex items-center gap-4 flex-1">
+              <div className="flex-shrink-0 w-11 h-11 rounded-full border border-[#111111]/8 dark:border-[#e5ded4]/12 bg-[#fcfaf7]/50 dark:bg-[#1e1b19]/50 flex items-center justify-center text-[#111111] dark:text-[#e5ded4] shadow-sm">
+                <MapPin size={18} className="stroke-[1.5]" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-sans font-semibold text-sm text-[#111111] dark:text-[#e5ded4]">Based in India</span>
+                <span className="font-serif italic text-xs text-[#b58953] dark:text-[#d4b483]">Open for meaningful work.</span>
+                <span className="font-sans text-[10px] text-[#6b6b6b] dark:text-[#a69e96] mt-0.5">mukulburoli@gmail.com</span>
+              </div>
+            </div>
           </div>
 
           {/* Tech Stack Marquee */}

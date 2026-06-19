@@ -12,6 +12,7 @@ const inter = { variable: 'font-inter' }
 const outfit = { variable: 'font-outfit' }
 const firaCode = { variable: 'font-fira-code' }
 const islandMoments = { variable: 'font-island-moments' }
+const newsreader = { variable: 'font-newsreader' }
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mukul-kumar.dev'
 
@@ -95,13 +96,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${outfit.variable} ${firaCode.variable} ${islandMoments.variable} h-full antialiased`}
+      className={`${inter.variable} ${outfit.variable} ${firaCode.variable} ${islandMoments.variable} ${newsreader.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Inter:wght@100..900&family=Island+Moments&family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Inter:wght@100..900&family=Island+Moments&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
