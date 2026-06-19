@@ -9,9 +9,10 @@ export function InteractiveSVGDivider() {
   const controlPoint = useRef({ x: 500, y: 30 })
 
   useEffect(() => {
+    const cpCurrent = controlPoint.current
     // Clean up any GSAP tweens on unmount
     return () => {
-      gsap.killTweensOf(controlPoint.current)
+      gsap.killTweensOf(cpCurrent)
     }
   }, [])
 
@@ -89,8 +90,7 @@ export function InteractiveSVGDivider() {
       onMouseLeave={handleMouseLeave}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleMouseLeave}
-      className="relative w-full h-[60px] max-w-5xl mx-auto flex items-center justify-center cursor-pointer select-none group"
-      style={{ touchAction: 'none' }}
+      className="relative w-full h-[60px] max-w-5xl mx-auto flex items-center justify-center cursor-pointer select-none group touch-none"
     >
       <svg
         viewBox="0 0 1000 60"
@@ -118,11 +118,11 @@ export function InteractiveSVGDivider() {
         <defs>
           {/* Subtle gradient so the line is elegant and glowing */}
           <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#111111" stopOpacity="0.02" />
-            <stop offset="25%" stopColor="#111111" stopOpacity="0.12" />
-            <stop offset="50%" stopColor="#7C3AED" stopOpacity="0.4" />
-            <stop offset="75%" stopColor="#111111" stopOpacity="0.12" />
-            <stop offset="100%" stopColor="#111111" stopOpacity="0.02" />
+            <stop offset="0%" stopColor="currentColor" stopOpacity="0.02" />
+            <stop offset="25%" stopColor="currentColor" stopOpacity="0.12" />
+            <stop offset="50%" stopColor="currentColor" stopOpacity="0.3" />
+            <stop offset="75%" stopColor="currentColor" stopOpacity="0.12" />
+            <stop offset="100%" stopColor="currentColor" stopOpacity="0.02" />
           </linearGradient>
         </defs>
       </svg>

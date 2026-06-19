@@ -49,18 +49,6 @@ export interface ProjectItem {
   lessonsLearned: string
 }
 
-export interface ExperienceItem {
-  company: string
-  role: string
-  location: string
-  startDate: string
-  endDate: string | 'Present'
-  summary: string
-  achievements: string[]
-  techStack: string[]
-  type: 'full-time' | 'freelance' | 'contract' | 'internship'
-}
-
 export interface SkillCategory {
   name: string
   color: string
@@ -74,77 +62,4 @@ export interface SkillItem {
   description?: string
 }
 
-export interface EducationItem {
-  degree: string
-  field: string
-  institution: string
-  location: string
-  startYear: number
-  endYear: number | 'Present'
-  gpa?: string
-  highlights?: string[]
-}
-
-export interface Achievement {
-  title: string
-  description: string
-  year: string
-  icon?: string
-}
-
-export interface JourneyMilestone {
-  id: string
-  year: string
-  title: string
-  description: string
-  type: 'start' | 'work' | 'project' | 'learning' | 'milestone' | 'vision'
-  highlight?: boolean
-  tech?: string[]
-}
-
-export interface SystemDesignDiagram {
-  id: string
-  title: string
-  description: string
-  nodes: DiagramNode[]
-  connections: DiagramConnection[]
-  category: 'web-app' | 'ai-system' | 'data-pipeline' | 'microservices' | 'caching'
-}
-
-export interface DiagramNode {
-  id: string
-  label: string
-  sublabel?: string
-  type: 'client' | 'api' | 'service' | 'database' | 'cache' | 'queue' | 'ai' | 'cdn' | 'auth'
-  position: { x: number; y: number }
-}
-
-export interface DiagramConnection {
-  from: string
-  to: string
-  label?: string
-  bidirectional?: boolean
-}
-
-export interface NavItem {
-  label: string
-  href: string
-  sectionId: string
-}
-
-export interface ChapterMilestone {
-  year: string
-  title: string
-  description: string
-  tech?: string[]
-  highlight?: boolean
-}
-
-export interface JourneyChapter {
-  id: string
-  number: string
-  title: string
-  description: string
-  milestones: ChapterMilestone[]
-}
 

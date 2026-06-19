@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from 'react'
 import { SectionHeader } from '../ui/SectionHeader'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { ArrowRight } from 'lucide-react'
 
 const NEXT_PROJECTS = [
   {
@@ -96,19 +97,22 @@ export function WhatImBuildingNext() {
           {NEXT_PROJECTS.map((item) => (
             <div
               key={item.index}
-              className="ledger-item grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 py-10 border-b border-[#111111]/10 items-start hover:bg-[#111111]/2 px-4 transition-colors duration-200"
+              className="ledger-item group grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 py-10 border-b border-[#111111]/10 items-start hover:bg-[#111111]/2 px-4 transition-all duration-300"
             >
               {/* Meta information */}
-              <div className="md:col-span-4 flex flex-col">
+              <div className="md:col-span-4 flex flex-col transition-all duration-300 group-hover:translate-x-2">
                 <span className="font-mono text-[9px] text-[#6b6b6b] uppercase tracking-widest mb-1.5">Area: {item.area}</span>
                 <div className="flex items-baseline gap-2">
                   <span className="font-mono text-xs font-bold text-[#111111]">{item.index}</span>
-                  <h3 className="text-lg font-heading font-black text-[#111111] tracking-tight">{item.title}</h3>
+                  <h3 className="text-lg font-heading font-black text-[#111111] tracking-tight flex items-center gap-2 group-hover:text-[#7C3AED] transition-colors duration-300">
+                    <span>{item.title}</span>
+                    <ArrowRight size={14} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                  </h3>
                 </div>
               </div>
 
               {/* Description copy */}
-              <p className="md:col-span-8 text-xs sm:text-sm text-[#6b6b6b] leading-relaxed font-sans">
+              <p className="md:col-span-8 text-xs sm:text-sm text-[#6b6b6b] leading-relaxed font-sans transition-all duration-300 group-hover:translate-x-1 group-hover:text-[#111111]/90">
                 {item.description}
               </p>
             </div>

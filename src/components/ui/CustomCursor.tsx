@@ -34,6 +34,7 @@ export function CustomCursor() {
 
     // Hide native cursor site-wide
     document.documentElement.style.cursor = 'none'
+    document.documentElement.classList.add('custom-cursor-active')
 
     gsap.set(dot, { xPercent: -50, yPercent: -50, opacity: 0 })
     gsap.set(ring, { xPercent: -50, yPercent: -50, opacity: 0 })
@@ -67,7 +68,7 @@ export function CustomCursor() {
 
     const enterLink = () => {
       gsap.to(ring, {
-        scale: 1.85,
+        scale: 1.3,
         borderWidth: '1.5px',
         duration: 0.28,
         ease: 'power2.out',
@@ -92,7 +93,7 @@ export function CustomCursor() {
       setLabelText(text)
       setIsLabeling(true)
       gsap.to(ring, {
-        scale: 3.5,
+        scale: 2.2,
         borderWidth: '0px',
         backgroundColor: 'rgba(255,255,255,1)',
         duration: 0.38,
@@ -114,11 +115,16 @@ export function CustomCursor() {
       gsap.to(dot, { scale: 1, duration: 0.2 })
     }
 
-    // Dynamic context labels based on element type
+    // Dynamic context labels based on element type.
+    // Elements with data-cursor-no-label="true" are skipped entirely.
     const getContextLabel = (el: HTMLElement): string => {
+      // Opt-out: UI-only controls (NanoCar, sliders, etc.) should not trigger label
+      if (el.dataset.cursorNoLabel) return ''
       if (el.dataset.cursorLabel) return el.dataset.cursorLabel
-      if (el.tagName === 'A') return 'View'
-      if (el.tagName === 'BUTTON' || el.getAttribute('role') === 'button') return 'Click'
+      // Only anchor tags with a real href get a label
+      if (el.tagName === 'A' && (el as HTMLAnchorElement).href) return 'View'
+      // Buttons only get a label if they carry an explicit data-cursor-label
+      // (raw <button> without it = UI control, no label wanted)
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') return 'Type'
       if (el.classList.contains('tech-icon')) return el.getAttribute('title') || 'Tech'
       if (el.classList.contains('nav-link')) return 'Navigate'
@@ -132,7 +138,7 @@ export function CustomCursor() {
         setLabelText(label)
         setIsLabeling(true)
         gsap.to(ring, {
-          scale: 2.8,
+          scale: 1.8,
           borderWidth: '0px',
           backgroundColor: 'rgba(255,255,255,0.95)',
           duration: 0.3,
@@ -191,6 +197,7 @@ export function CustomCursor() {
       document.removeEventListener('mouseleave', onMouseLeaveWindow)
       observer.disconnect()
       document.documentElement.style.cursor = ''
+      document.documentElement.classList.remove('custom-cursor-active')
     }
   }, [])
 
@@ -199,35 +206,17 @@ export function CustomCursor() {
       {/* Inner dot — snaps to mouse */}
       <div
         ref={dotRef}
-        className="fixed top-0 left-0 pointer-events-none z-[9999] hidden lg:flex items-center justify-center"
-        style={{
-          width: 8,
-          height: 8,
-          borderRadius: '50%',
-          backgroundColor: '#ffffff',
-          mixBlendMode: 'difference',
-        }}
+        className="fixed top-0 left-0 pointer-events-none z-[9999] hidden lg:flex items-center justify-center cursor-dot-style"
       />
 
       {/* Outer ring — lags behind with elastic ease */}
       <div
         ref={ringRef}
-        className="fixed top-0 left-0 pointer-events-none z-[9998] hidden lg:flex items-center justify-center"
-        style={{
-          width: 40,
-          height: 40,
-          borderRadius: '50%',
-          border: '1px solid #ffffff',
-          backgroundColor: 'rgba(255,255,255,0)',
-          mixBlendMode: 'difference',
-        }}
+        className="fixed top-0 left-0 pointer-events-none z-[9998] hidden lg:flex items-center justify-center cursor-ring-style"
       >
         {/* Context label shown on hover */}
         {isLabeling && labelText && (
-          <span
-            className="text-[9px] font-mono font-bold tracking-widest uppercase text-black select-none whitespace-nowrap"
-            style={{ mixBlendMode: 'normal' }}
-          >
+          <span className="cursor-label">
             {labelText}
           </span>
         )}

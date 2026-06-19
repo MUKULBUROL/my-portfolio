@@ -3,18 +3,15 @@ import { twMerge } from 'tailwind-merge'
 
 interface GlassCardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
-  glowColor?: 'purple' | 'cyan' | 'green' | 'none'
   hoverEffect?: boolean
 }
 
 export function GlassCard({
   children,
   className,
-  glowColor = 'none',
   hoverEffect = true,
   ...props
 }: GlassCardProps) {
-  void glowColor;
   return (
     <div
       className={twMerge(

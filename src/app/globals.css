@@ -5,19 +5,65 @@
    Warm beige and charcoal typography-first system
    ============================================================ */
 
+:root {
+  --bg-color: #f5efe8;
+  --bg-surface: #fcfaf7;
+  --bg-elevated: #ffffff;
+  --text-color: #111111;
+  --text-muted: #6b6b6b;
+  --border-color: rgba(17, 17, 17, 0.08);
+  --border-strong: rgba(17, 17, 17, 0.15);
+  --accent-color: #7C3AED;
+  
+  --bg-navbar: rgba(255, 255, 255, 0.75);
+  --notebook-page-bg: linear-gradient(135deg, #fdfaf6 0%, #f7f0e8 100%);
+  --notebook-page-bg-4: linear-gradient(135deg, #f8f3ec 0%, #f0e8de 100%);
+  --notebook-page-bg-6: linear-gradient(135deg, #f3ece2 0%, #e8ddd0 100%);
+  --notebook-line-color: rgba(17, 17, 17, 0.05);
+  --notebook-line-color-back: rgba(17, 17, 17, 0.04);
+
+  --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-outfit: 'Outfit', system-ui, sans-serif;
+  --font-fira-code: 'Fira Code', monospace;
+  --font-island-moments: 'Island Moments', cursive;
+}
+
+:root.dark {
+  --bg-color: #161412;
+  --bg-surface: #1e1b19;
+  --bg-elevated: #262220;
+  --text-color: #e5ded4;
+  --text-muted: #a69e96;
+  --border-color: rgba(229, 222, 212, 0.1);
+  --border-strong: rgba(229, 222, 212, 0.2);
+  --accent-color: #a78bfa;
+
+  --bg-navbar: rgba(22, 20, 18, 0.75);
+  --notebook-page-bg: linear-gradient(135deg, #2a2624 0%, #1e1b19 100%);
+  --notebook-page-bg-4: linear-gradient(135deg, #252220 0%, #1a1716 100%);
+  --notebook-page-bg-6: linear-gradient(135deg, #201d1c 0%, #151312 100%);
+  --notebook-line-color: rgba(229, 222, 212, 0.05);
+  --notebook-line-color-back: rgba(229, 222, 212, 0.04);
+
+  --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-outfit: 'Outfit', system-ui, sans-serif;
+  --font-fira-code: 'Fira Code', monospace;
+  --font-island-moments: 'Island Moments', cursive;
+}
+
 @theme {
   /* Colors */
-  --color-bg: #f5efe8;
-  --color-bg-surface: #fcfaf7;
-  --color-bg-elevated: #ffffff;
-  --color-primary: #111111; /* Charcoal/Accent primary */
+  --color-bg: var(--bg-color);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-primary: var(--text-color);
   --color-primary-glow: rgba(17, 17, 17, 0.04);
-  --color-accent: #111111;
+  --color-accent: var(--accent-color);
   --color-accent-glow: rgba(17, 17, 17, 0.04);
-  --color-text: #111111;
-  --color-muted: #6b6b6b;
-  --color-border: rgba(17, 17, 17, 0.08);
-  --color-border-strong: rgba(17, 17, 17, 0.15);
+  --color-text: var(--text-color);
+  --color-muted: var(--text-muted);
+  --color-border: var(--border-color);
+  --color-border-strong: var(--border-strong);
 
   /* Fonts */
   --font-sans: var(--font-inter), system-ui, sans-serif;
@@ -51,17 +97,18 @@
 }
 
 html {
-  background-color: #f5efe8; /* fallback before canvas loads */
+  background-color: var(--bg-color); /* fallback before canvas loads */
   scroll-behavior: auto; /* Lenis handles smooth scrolling */
 }
 
 body {
   background-color: transparent;
-  color: #111111;
+  color: var(--text-color);
   font-family: var(--font-inter), system-ui, sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: color 0.3s ease;
 }
 
 /* Custom cursor — hide native cursor everywhere */
@@ -242,39 +289,7 @@ html.lenis body {
   pointer-events: none;
 }
 
-/* ============================================================
-   HERO — Rotating Gradient Border for Photo
-   ============================================================ */
 
-@keyframes border-rotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.photo-rotating-border {
-  position: absolute;
-  inset: -4px;
-  border-radius: 40% 60% 55% 45% / 50% 45% 55% 50%;
-  background: conic-gradient(
-    from 0deg,
-    rgba(139, 92, 246, 0.4),
-    rgba(59, 130, 246, 0.3),
-    rgba(16, 185, 129, 0.3),
-    rgba(245, 158, 11, 0.3),
-    rgba(139, 92, 246, 0.4)
-  );
-  animation: border-rotate 8s linear infinite;
-  z-index: -1;
-  pointer-events: none;
-}
-
-.photo-rotating-border::after {
-  content: '';
-  position: absolute;
-  inset: 3px;
-  border-radius: inherit;
-  background: #f5efe8;
-}
 
 /* ============================================================
    NAVBAR — Frosted Glass Effect
@@ -288,16 +303,22 @@ html.lenis body {
   z-index: 1000;
 
   /* The Glass Effect */
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--bg-navbar);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 
   /* The Premium Polish */
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  padding: 16px 48px;
+  border-bottom: 1px solid var(--border-color);
+  padding: 12px 24px;
 
   /* Smooth transition if you want it to change on scroll */
   transition: all 0.3s ease;
+}
+
+@media (min-width: 768px) {
+  .navbar {
+    padding: 16px 48px;
+  }
 }
 
 /* ============================================================
@@ -315,7 +336,7 @@ html.lenis body {
   bottom: -4px;
   width: 0;
   height: 1.5px;
-  background-color: #111111;
+  background-color: var(--text-color);
   transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .nav-link:hover::after {
@@ -330,7 +351,7 @@ html.lenis body {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background-color: #111111;
+  background-color: var(--text-muted);
 }
 
 /* Film Grain Overlay (Subtle randomized animation overlay) */
@@ -452,11 +473,119 @@ html.lenis body {
 
 /* Page stack depth shading — lighter pages at the back */
 .page:nth-child(n+4) .page-front {
-  background: linear-gradient(135deg, #f8f3ec 0%, #f0e8de 100%) !important;
+  background: var(--notebook-page-bg-4) !important;
 }
 .page:nth-child(n+6) .page-front {
-  background: linear-gradient(135deg, #f3ece2 0%, #e8ddd0 100%) !important;
+  background: var(--notebook-page-bg-6) !important;
 }
+
+/* Notebook styling variables converted to classes to eliminate inline styles */
+.notebook-container {
+  width: min(88vw, 960px);
+  height: min(72vh, 580px);
+  perspective: 2200px;
+}
+
+.notebook-shadow {
+  box-shadow: 0 32px 80px rgba(60, 40, 20, 0.22), 0 8px 24px rgba(60, 40, 20, 0.14);
+  z-index: 0;
+}
+
+.notebook-spine {
+  width: 28px;
+  background: linear-gradient(180deg, #2a2218 0%, #1a1610 100%);
+  box-shadow: inset -3px 0 8px rgba(0, 0, 0, 0.35), 3px 0 6px rgba(0, 0, 0, 0.2);
+  border-radius: 4px 0 0 4px;
+}
+
+.notebook-ring {
+  width: 36px;
+  height: 14px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8a7a60, #c4b080, #8a7a60);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(255, 255, 220, 0.15);
+  flex-shrink: 0;
+}
+
+.notebook-back-cover {
+  left: 28px;
+  background: #1a1610;
+  z-index: 1;
+}
+
+.notebook-page-container {
+  left: 28px;
+  transform-style: preserve-3d;
+  transform-origin: left center;
+}
+
+.notebook-page-front {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: var(--notebook-page-bg);
+  border-radius: 0 4px 4px 0;
+}
+
+.notebook-page-lines {
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 31px,
+    var(--notebook-line-color) 31px,
+    var(--notebook-line-color) 32px
+  );
+  background-position-y: 44px;
+}
+
+.notebook-page-red-margin {
+  left: 15%;
+  width: 1px;
+  background: rgba(200, 80, 60, 0.18);
+}
+
+.notebook-page-edge-right {
+  width: 6px;
+  background: linear-gradient(90deg, transparent, rgba(180, 150, 110, 0.15));
+}
+
+.notebook-page-back {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: rotateY(180deg);
+  background: var(--notebook-page-bg);
+  border-radius: 4px 0 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notebook-page-back-lines {
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 31px,
+    var(--notebook-line-color-back) 31px,
+    var(--notebook-line-color-back) 32px
+  );
+  background-position-y: 44px;
+}
+
+/* Custom Cursor Classes to eliminate inline styles */
+.cursor-dot-style {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  mix-blend-mode: difference;
+}
+
+.cursor-ring-style {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #ffffff;
+  background-color: rgba(255, 255, 255, 0);
+  mix-blend-mode: difference;
+}
+
 
 /* ============================================================
    CUSTOM CURSOR — label span inside ring
@@ -693,33 +822,9 @@ html.lenis body {
   width: 0.3em;
 }
 
-/* ============================================================
-   PHOTO — Animated Gradient Border
-   ============================================================ */
-
-@keyframes gradient-xy {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-@keyframes gradient-xy-reverse {
-  0%, 100% { background-position: 100% 50%; }
-  50% { background-position: 0% 50%; }
-}
-
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-20px); }
-}
-
-.animate-gradient-xy {
-  background-size: 200% 200%;
-  animation: gradient-xy 3s ease infinite;
-}
-
-.animate-gradient-xy-reverse {
-  background-size: 200% 200%;
-  animation: gradient-xy-reverse 3s ease infinite;
 }
 
 .animate-float {
@@ -787,9 +892,9 @@ html.lenis body {
   bottom: -4px;
   left: 0;
   width: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #7C3AED, #3B82F6);
-  border-radius: 2px;
+  height: 2px;
+  background-color: var(--text-muted);
+  border-radius: 1px;
   transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -835,7 +940,7 @@ html.lenis body {
   display: inline-flex;
   align-items: center;
   gap: 3rem;
-  animation: marquee-scroll 25s linear infinite;
+  animation: marquee-scroll 32s linear infinite;
   will-change: transform;
 }
 
@@ -847,25 +952,55 @@ html.lenis body {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  opacity: 0.65;
-  transition: opacity 0.3s ease;
+  opacity: 0.95;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   flex-shrink: 0;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
 }
 
 .tech-marquee-item:hover {
-  opacity: 0.8;
+  opacity: 1;
+  transform: scale(1.03);
 }
 
 .tech-marquee-icon {
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(17, 17, 17, 0.06);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(17, 17, 17, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 14px;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgba(17, 17, 17, 0.04);
+}
+
+/* ============================================================
+   SYSTEM STATUS — Live Signal Bars Animation
+   ============================================================ */
+
+@keyframes signal-grow-1 {
+  0%, 100% { height: 4px; }
+  50% { height: 12px; }
+}
+@keyframes signal-grow-2 {
+  0%, 100% { height: 10px; }
+  50% { height: 4px; }
+}
+@keyframes signal-grow-3 {
+  0%, 100% { height: 6px; }
+  50% { height: 14px; }
+}
+
+.animate-signal-1 {
+  animation: signal-grow-1 0.9s ease-in-out infinite;
+}
+.animate-signal-2 {
+  animation: signal-grow-2 0.9s ease-in-out infinite 0.15s;
+}
+.animate-signal-3 {
+  animation: signal-grow-3 0.9s ease-in-out infinite 0.3s;
 }

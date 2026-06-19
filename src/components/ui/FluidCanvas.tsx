@@ -3,6 +3,8 @@
 import React, { useRef, useEffect, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import { useTheme } from '@/context/ThemeContext'
+import { gsap } from 'gsap'
 
 // Vertex Shader
 const vertexShader = `
@@ -19,6 +21,7 @@ const fragmentShader = `
   uniform float u_time;
   uniform vec2 u_resolution;
   uniform vec2 uMouse;
+  uniform float u_dark;
   varying vec2 vUv;
 
   // Simple hash for pseudo-randomness
@@ -50,10 +53,21 @@ const fragmentShader = `
 
   // Color palette for organic shifts
   vec3 palette(float t) {
-    vec3 a = vec3(0.96, 0.94, 0.92);   // Warm cream base
-    vec3 b = vec3(0.75, 0.68, 0.62);   // Muted brown
-    vec3 c = vec3(0.47, 0.42, 0.38);   // Deep taupe
-    vec3 d = vec3(0.68, 0.61, 0.55);   // Warm gray
+    vec3 a_light = vec3(0.96, 0.94, 0.92);   // Warm cream base
+    vec3 b_light = vec3(0.75, 0.68, 0.62);   // Muted brown
+    vec3 c_light = vec3(0.47, 0.42, 0.38);   // Deep taupe
+    vec3 d_light = vec3(0.68, 0.61, 0.55);   // Warm gray
+
+    vec3 a_dark = vec3(0.086, 0.078, 0.07);  // Warm deep charcoal base (#161412)
+    vec3 b_dark = vec3(0.12, 0.11, 0.10);    // Warm gray-brown
+    vec3 c_dark = vec3(0.18, 0.16, 0.14);    // Taupe highlight
+    vec3 d_dark = vec3(0.20, 0.18, 0.16);    // Gray highlight
+
+    vec3 a = mix(a_light, a_dark, u_dark);
+    vec3 b = mix(b_light, b_dark, u_dark);
+    vec3 c = mix(c_light, c_dark, u_dark);
+    vec3 d = mix(d_light, d_dark, u_dark);
+
     return a + b * cos(6.28318 * (c * t + d + u_time * 0.05));
   }
 
@@ -113,7 +127,7 @@ const fragmentShader = `
   }
 `
 
-function WaterPlane() {
+function WaterPlane({ isDark }: { isDark: boolean }) {
   const materialRef = useRef<THREE.ShaderMaterial>(null)
   const ripplesRef = useRef(
     Array(8).fill(null).map(() => ({ x: 0, y: 0, z: 0 }))
@@ -149,11 +163,24 @@ function WaterPlane() {
     return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
 
+  // Animate dark mode transition in shader
+  useEffect(() => {
+    if (materialRef.current) {
+      gsap.to(materialRef.current.uniforms.u_dark, {
+        value: isDark ? 1.0 : 0.0,
+        duration: 0.8,
+        ease: 'power2.out',
+        overwrite: 'auto'
+      })
+    }
+  }, [isDark])
+
   const uniforms = useMemo(() => ({
     u_time: { value: 0 },
     u_resolution: { value: new THREE.Vector2(1920, 1080) },
     u_ripples: { value: Array(8).fill(null).map(() => new THREE.Vector3(0, 0, 0)) },
     uMouse: { value: new THREE.Vector2(0.5, 0.5) },
+    u_dark: { value: 0.0 },
   }), [])
 
   useFrame((state, delta) => {
@@ -190,6 +217,9 @@ function WaterPlane() {
  * When `fixed` prop is true it covers the entire viewport as a background layer.
  */
 export function FluidCanvas({ fixed = false }: { fixed?: boolean }) {
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
+
   const positionClass = fixed
     ? 'fixed inset-0 w-full h-full pointer-events-none select-none'
     : 'absolute inset-0 w-full h-full pointer-events-none select-none'
@@ -201,7 +231,7 @@ export function FluidCanvas({ fixed = false }: { fixed?: boolean }) {
         gl={{ antialias: false, depth: false, stencil: false }}
         style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
       >
-        <WaterPlane />
+        <WaterPlane isDark={isDark} />
       </Canvas>
     </div>
   )

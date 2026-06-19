@@ -1,30 +1,17 @@
 'use client'
 
 import React, { useEffect, useRef } from 'react'
-import Image from 'next/image'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { MagneticButton } from '../ui/MagneticButton'
 import { ArrowRight, ChevronDown, Download, Mail } from 'lucide-react'
 import { profile } from '@/data/profile'
+import { resume } from '@/data/resume'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { TechMarquee } from '../ui/TechMarquee'
+import { HeroAvatar } from '../ui/HeroAvatar'
 
 gsap.registerPlugin(ScrollTrigger)
-
-const marqueeItems = [
-  { name: 'React', icon: '⚛️' },
-  { name: 'Next.js', icon: '▲' },
-  { name: 'TypeScript', icon: '📘' },
-  { name: 'Node.js', icon: '🟢' },
-  { name: 'Python', icon: '🐍' },
-  { name: 'Go', icon: '🔵' },
-  { name: 'PostgreSQL', icon: '🐘' },
-  { name: 'Docker', icon: '🐳' },
-  { name: 'AWS', icon: '☁️' },
-  { name: 'Redis', icon: '🔴' },
-  { name: 'GraphQL', icon: '◈' },
-  { name: 'Git', icon: '📦' },
-]
 
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -209,8 +196,7 @@ export function Hero() {
     <section
       id="hero"
       ref={containerRef}
-      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden pt-20"
-      style={{ background: 'transparent' }}
+      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden pt-20 bg-transparent"
       aria-label="Hero section"
     >
       {/* Subtle vignette overlay */}
@@ -235,7 +221,7 @@ export function Hero() {
             {/* Name with staggered character reveal */}
             <h1
               ref={nameRef}
-              className="text-5xl sm:text-7xl md:text-8xl font-black font-heading tracking-tight leading-[0.95] text-[#111111] select-none"
+              className="text-5xl sm:text-7xl md:text-8xl font-heading font-black tracking-tight leading-[0.95] text-[#111111] select-none"
             />
 
             {/* Creative hand-drawn accent line SVG */}
@@ -264,31 +250,21 @@ export function Hero() {
           </div>
 
           <div ref={descRef} className="mb-6 opacity-0">
-            <p className="text-[#6b6b6b] text-base sm:text-lg leading-relaxed font-sans max-w-md">
-              High-performance backends, <span className="text-highlight">AI pipelines</span>, and systems that actually work in production.
+            <p className="text-[#111111]/85 font-medium text-base sm:text-lg leading-relaxed font-sans max-w-md">
+              High-performance backends, <span className="text-highlight font-bold text-[#7C3AED]">AI pipelines</span>, and systems that actually work in production.
             </p>
           </div>
 
           {/* Tech Stack Marquee */}
           <div ref={techRef} className="w-full max-w-md mb-10 opacity-0">
-            <div className="tech-marquee">
-              <div className="tech-marquee-track">
-                {[...marqueeItems, ...marqueeItems].map((tech, i) => (
-                  <div key={`${tech.name}-${i}`} className="tech-marquee-item">
-                    <div className="tech-marquee-icon">
-                      <span>{tech.icon}</span>
-                    </div>
-                    <span className="text-[11px] font-mono text-[#111111] tracking-wide">{tech.name}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <TechMarquee />
           </div>
 
           {/* CTA Buttons */}
           <div ref={ctaRef} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 opacity-0">
             <MagneticButton
               onClick={() => scrollToSection('skills')}
+              data-cursor-label="Explore"
               className="cta-button px-8 py-4 bg-[#111111] hover:bg-[#222222] text-[#f5efe8] rounded-full text-xs font-mono font-semibold tracking-wide flex items-center justify-center gap-2 group"
               aria-label="View selected work"
             >
@@ -297,7 +273,7 @@ export function Hero() {
             </MagneticButton>
 
             <a
-              href="/resume.pdf"
+              href={resume.pdfPath}
               target="_blank"
               rel="noopener noreferrer"
               className="cta-button-outline px-6 py-4 border-2 border-[#111111] hover:bg-[#111111] hover:text-[#f5efe8] text-[#111111] rounded-full text-xs font-mono font-semibold tracking-wide flex items-center justify-center gap-2"
@@ -308,6 +284,7 @@ export function Hero() {
 
             <MagneticButton
               onClick={() => scrollToSection('connect')}
+              data-cursor-label="Connect"
               className="cta-button-outline px-6 py-4 border-2 border-[#111111] hover:bg-[#111111] hover:text-[#f5efe8] text-[#111111] rounded-full text-xs font-mono font-semibold tracking-wide flex items-center justify-center gap-2"
               aria-label="Let's talk"
             >
@@ -318,41 +295,7 @@ export function Hero() {
         </div>
 
         {/* ── Right column: photo ── */}
-        <div
-          ref={photoRef}
-          className="opacity-0 flex-shrink-0 order-1 md:order-2 relative"
-          aria-hidden="false"
-        >
-          {/* Animated gradient border wrapper */}
-          <div className="relative inline-block">
-            {/* Rotating gradient layers */}
-            <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 animate-gradient-xy opacity-80" />
-            <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600 animate-gradient-xy-reverse opacity-60" />
-            
-            {/* Photo frame — circular with border */}
-            <div className="relative w-48 h-48 sm:w-72 sm:h-72 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-warm-beige shadow-2xl animate-float">
-              <Image
-                src="/Profile.jpg"
-                alt={`${profile.name} — ${profile.headline}`}
-                fill
-                sizes="(max-width: 640px) 192px, (max-width: 768px) 288px, 320px"
-                className="object-cover object-center"
-                priority
-              />
-            </div>
-          </div>
-
-          {/* Floating badge — availability status */}
-          <div
-            className="availability-badge absolute -bottom-3 -right-3 flex items-center gap-2 bg-white/80 backdrop-blur-sm border border-[#111111]/8 rounded-full px-3 py-1.5 shadow-md"
-          >
-            <span className="tooltip">Available for freelance/full-time</span>
-            <span className="status-dot-pulse" />
-            <span className="text-[10px] font-mono text-[#111111] font-semibold tracking-wide">
-              {profile.availabilityLabel}
-            </span>
-          </div>
-        </div>
+        <HeroAvatar ref={photoRef} />
       </div>
 
       {/* Scroll indicator */}

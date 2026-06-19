@@ -3,67 +3,65 @@ import type { ProjectItem } from '@/types'
 export const projects: ProjectItem[] = [
   {
     id: 'documind-ai',
-    name: 'DocuMind AI – Document Intelligence Platform',
-    tagline: 'AI-powered platform for semantic search and audio insights via Podcast Mode',
+    name: 'DocuMind AI',
+    tagline: 'AI-powered document intelligence platform supporting semantic search',
     description:
-      'An AI-powered platform enabling PDF upload, semantic search, and audio insights via Podcast Mode. Ranked in the Top 100 out of 60,000+ teams at Adobe Hackathon.',
+      'An AI-powered document intelligence platform supporting semantic search and retrieval. Designed a semantic retrieval pipeline using OpenAI embeddings and Google Gemini.',
     problem:
       'Finding relevant information across large document collections is time-consuming and inefficient. Users need a smarter way to search, understand, and consume document content.',
     solution:
-      'Built an end-to-end document intelligence platform with FastAPI backend, semantic search using OpenAI embeddings, and an Azure TTS pipeline for automated audio generation in Podcast Mode.',
+      'Built an AI-powered document intelligence platform supporting semantic search and retrieval. Designed a semantic retrieval pipeline using OpenAI embeddings and Google Gemini.',
     architecture:
-      'FastAPI backend with APIs for document ingestion and semantic queries. Google Gemini for AI processing, OpenAI embeddings for vector search, and Docker for scalable, modular deployment.',
+      'Designed a semantic retrieval pipeline using OpenAI embeddings and Google Gemini. Processed 10K+ document chunks while maintaining sub-second retrieval latency.',
     challenges:
-      'Integrating multiple AI services (Gemini, OpenAI) while maintaining low latency and ensuring accurate semantic retrieval across diverse document formats.',
+      'Ensuring sub-second retrieval latency while processing large datasets of 10K+ document chunks and integrating multiple LLM APIs.',
     results:
-      'Ranked in the Top 100 out of 60,000+ teams at Adobe Hackathon. Delivered a fully functional platform with document ingestion, semantic search, and podcast-mode audio generation.',
+      'Ranked among the Top 100 teams out of 60,000+ participants in Adobe India Hackathon 2025.',
     metrics: [
-      'Top 100 out of 60,000+ teams at Adobe Hackathon',
-      'End-to-end document ingestion pipeline',
-      'Semantic search with OpenAI embeddings',
-      'Azure TTS for automated audio generation',
+      'Top 100 teams out of 60,000+ participants in Adobe India Hackathon 2025',
+      'Processed 10K+ document chunks',
+      'Sub-second retrieval latency',
+      'OpenAI embeddings and Google Gemini integration',
     ],
     techStack: [
       'Python',
-      'FastAPI',
-      'Google Gemini',
-      'OpenAI',
+      'OpenAI Embeddings',
+      'Gemini',
       'Docker',
-      'Azure TTS',
     ],
-    tags: ['AI', 'Python', 'FastAPI', 'NLP'],
+    tags: ['AI', 'Python', 'Embeddings', 'Gemini'],
     featured: true,
     status: 'production',
-    lessonsLearned: 'Combining multiple AI services requires careful orchestration. Semantic search alone is not enough — pairing it with audio generation creates a more accessible and versatile platform.',
+    lessonsLearned: 'Processing large document collections in real-time requires careful orchestration of vector databases and embedding APIs to maintain low latency.',
   },
   {
     id: 'smart-expense-splitter',
-    name: 'Smart Expense Splitter System',
-    tagline: 'High-performance backend for managing group expenses with optimized settlements',
+    name: 'Splitwise Backend',
+    tagline: 'Java-based expense-sharing platform with optimized settlements',
     description:
-      'A high-performance backend platform for managing group expenses with optimized settlements, built with Java 17 and Spring Boot.',
+      'A backend expense-sharing platform using Spring Boot and MySQL, exposing REST APIs for expense tracking, balance computation, and debt settlement. Engineered a Greedy Settlement Algorithm to minimize transaction count.',
     problem:
-      'Group expense tracking and fair settlement is complex when multiple people share costs across various activities. Manual calculation is error-prone and time-consuming.',
+      'Group expense tracking and fair settlement calculations are complex and inefficient when multiple users share costs across various activities.',
     solution:
-      'Developed a scalable backend using Java 17 and Spring Boot with a highly normalized MySQL database via Spring Data JPA. Engineered a Greedy Settlement Algorithm to compute net balances and optimally match debtors with creditors.',
+      'Built a backend expense-sharing platform using Spring Boot and MySQL, exposing REST APIs for expense tracking, balance computation, and debt settlement.',
     architecture:
-      'Spring Boot REST API with Spring Data JPA for ORM. MySQL database with highly normalized schema handling complex Many-to-Many relationships. Greedy Settlement Algorithm minimizes total transaction count.',
+      'Structured application layers following service-repository architecture principles. Modeled many-to-many user-expense relationships using Spring Data JPA and normalized relational schemas.',
     challenges:
-      'Resolving bidirectional ORM dependency issues to ensure stable JSON serialization and faster REST API responses. Optimizing the settlement algorithm for minimal transactions.',
+      'Modeling complex database relationships and design patterns while ensuring optimal settlement execution.',
     results:
-      'Efficiently manages group expenses with optimal settlement calculations. Minimized total transaction count through greedy algorithm optimization.',
+      'Implemented a Greedy Settlement Algorithm reducing transaction count by nearly 40%.',
     metrics: [
-      'Optimized settlement algorithm',
-      'Normalized MySQL database design',
-      'Fast REST API responses',
-      'Handles complex Many-to-Many relationships',
+      'Greedy Settlement Algorithm reduces transaction count by nearly 40%',
+      'Exposed REST APIs for tracking, balance computation, and debt settlement',
+      'Many-to-many user-expense relationships via Spring Data JPA',
+      'Highly normalized relational database schema',
     ],
-    techStack: ['Java 17', 'Spring Boot', 'Spring Data JPA', 'MySQL', 'REST API'],
+    techStack: ['Java', 'Spring Boot', 'MySQL', 'Spring Data JPA', 'REST APIs'],
     tags: ['Java', 'Backend', 'Database', 'Algorithms'],
     githubUrl: 'https://github.com/MUKULBUROL/Splitwise-Springboot-project',
     featured: true,
     status: 'production',
-    lessonsLearned: 'ORM bidirectional dependencies can cause serialization issues. Careful schema design and algorithm optimization are critical for performance in financial systems.',
+    lessonsLearned: 'Modeling relational schemas for financial structures requires strict constraints and transactional safety to prevent inconsistencies during settlement calculations.',
   },
   {
     id: 'graph-recommendation-system',

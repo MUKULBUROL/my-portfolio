@@ -1,13 +1,12 @@
 'use client'
 
 import React, { useEffect, useRef } from 'react'
-import Link from 'next/link'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { projects as staticProjects } from '@/data/projects'
-import { ProjectMinimalVisual } from '../ui/ProjectMinimalVisual'
 import { ArrowRight } from 'lucide-react'
 import type { ProjectItem } from '@/types'
+import { NotebookPage } from '../ui/NotebookPage'
 
 interface SelectedWorkProps {
   initialProjects?: ProjectItem[]
@@ -15,17 +14,6 @@ interface SelectedWorkProps {
 
 /**
  * Book page-flip project showcase.
- *
- * Layout concept:
- * ─────────────────────────────────────────────────────────
- *  • A notebook sits in the center of the screen.
- *  • The left half of the notebook always shows the current project.
- *  • When you scroll, the RIGHT page lifts (rotateY 0 → -180°) and
- *    lands on the left, revealing the next project underneath.
- *  • Each flip is driven by GSAP ScrollTrigger scrub, so the speed
- *    matches your scroll velocity — it feels physical.
- *  • After all projects are flipped, the back-cover GitHub CTA appears.
- * ─────────────────────────────────────────────────────────
  */
 export function SelectedWork({ initialProjects }: SelectedWorkProps) {
   const DISPLAY_PROJECTS = (initialProjects && initialProjects.length > 0)
@@ -104,8 +92,7 @@ export function SelectedWork({ initialProjects }: SelectedWorkProps) {
     <section
       id="selected-work"
       ref={sectionRef}
-      className="relative w-full h-screen flex flex-col justify-center items-center overflow-hidden"
-      style={{ background: 'transparent' }}
+      className="relative w-full h-screen flex flex-col justify-center items-center overflow-hidden bg-transparent"
       aria-label="Selected projects — book page flip"
     >
       {/* Section label */}
@@ -132,58 +119,31 @@ export function SelectedWork({ initialProjects }: SelectedWorkProps) {
       {/* ──── NOTEBOOK ──── */}
       <div
         ref={bookRef}
-        className="notebook relative"
-        style={{
-          width: 'min(88vw, 960px)',
-          height: 'min(72vh, 580px)',
-          perspective: '2200px',
-        }}
+        className="notebook notebook-container relative"
       >
         {/* Notebook shadow */}
         <div
-          className="absolute inset-0 rounded-[4px] pointer-events-none"
-          style={{
-            boxShadow: '0 32px 80px rgba(60,40,20,0.22), 0 8px 24px rgba(60,40,20,0.14)',
-            zIndex: 0,
-          }}
+          className="absolute inset-0 rounded-[4px] pointer-events-none notebook-shadow"
           aria-hidden="true"
         />
 
         {/* Left SPINE strip */}
         <div
-          className="absolute left-0 top-0 bottom-0 z-30 flex flex-col items-center justify-between py-4"
-          style={{
-            width: 28,
-            background: 'linear-gradient(180deg, #2a2218 0%, #1a1610 100%)',
-            boxShadow: 'inset -3px 0 8px rgba(0,0,0,0.35), 3px 0 6px rgba(0,0,0,0.2)',
-            borderRadius: '4px 0 0 4px',
-          }}
+          className="absolute left-0 top-0 bottom-0 z-30 flex flex-col items-center justify-between py-4 notebook-spine"
           aria-hidden="true"
         >
           {/* Spine rings */}
           {Array.from({ length: 9 }).map((_, i) => (
             <div
               key={i}
-              style={{
-                width: 36,
-                height: 14,
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #8a7a60, #c4b080, #8a7a60)',
-                boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.5), 0 1px 2px rgba(255,255,220,0.15)',
-                flexShrink: 0,
-              }}
+              className="notebook-ring"
             />
           ))}
         </div>
 
         {/* ── BACK COVER: GitHub CTA (visible after all flips) ── */}
         <div
-          className="absolute inset-0 flex items-center justify-center rounded-[4px]"
-          style={{
-            left: 28,
-            background: '#1a1610',
-            zIndex: 1,
-          }}
+          className="absolute inset-0 flex items-center justify-center rounded-[4px] notebook-back-cover"
         >
           <div className="flex flex-col items-center gap-6 px-8 text-center">
             <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#8a7a60]">
@@ -205,154 +165,16 @@ export function SelectedWork({ initialProjects }: SelectedWorkProps) {
         </div>
 
         {/* ── PROJECT PAGES ── */}
-        {/* Rendered in reverse order so page 0 is on top */}
         {[...DISPLAY_PROJECTS].reverse().map((project, revIdx) => {
           const idx = DISPLAY_PROJECTS.length - 1 - revIdx
           return (
-            <div
+            <NotebookPage
               key={project.id}
-              ref={(el) => addPageRef(el, idx)}
-              className="page absolute inset-0"
-              style={{
-                left: 28,
-                transformStyle: 'preserve-3d',
-                transformOrigin: 'left center',
-                zIndex: 10 + (DISPLAY_PROJECTS.length - 1 - idx),
-              }}
-              data-cursor-label="Scroll"
-            >
-              {/* ── FRONT FACE (current project) ── */}
-              <div
-                className="page-face page-front absolute inset-0 flex overflow-hidden project-card"
-                style={{
-                  backfaceVisibility: 'hidden',
-                  WebkitBackfaceVisibility: 'hidden',
-                  background: 'linear-gradient(135deg, #fdfaf6 0%, #f7f0e8 100%)',
-                  borderRadius: '0 4px 4px 0',
-                }}
-              >
-                {/* Paper texture lines */}
-                <div
-                  className="absolute inset-0 pointer-events-none"
-                  style={{
-                    backgroundImage: `
-                      repeating-linear-gradient(
-                        transparent,
-                        transparent 31px,
-                        rgba(17,17,17,0.05) 31px,
-                        rgba(17,17,17,0.05) 32px
-                      )
-                    `,
-                    backgroundPositionY: '44px',
-                  }}
-                  aria-hidden="true"
-                />
-
-                {/* Red margin line */}
-                <div
-                  className="absolute top-0 bottom-0 pointer-events-none"
-                  style={{ left: '15%', width: 1, background: 'rgba(200, 80, 60, 0.18)' }}
-                  aria-hidden="true"
-                />
-
-                {/* Page edge right */}
-                <div
-                  className="absolute top-0 right-0 bottom-0 pointer-events-none"
-                  style={{
-                    width: 6,
-                    background: 'linear-gradient(90deg, transparent, rgba(180,150,110,0.15))',
-                  }}
-                  aria-hidden="true"
-                />
-
-                {/* Content layout */}
-                <div className="flex flex-col md:flex-row w-full h-full p-6 md:p-10 gap-6">
-                  
-                  {/* Left: project visual */}
-                  <div className="flex-1 flex items-center justify-center min-h-0">
-                    <div className="w-full h-full max-h-64 md:max-h-none">
-                      <ProjectMinimalVisual projectId={project.id} />
-                    </div>
-                  </div>
-
-                  {/* Right: project details */}
-                  <div className="flex-1 flex flex-col justify-center gap-3 md:pl-6 md:border-l border-[#111111]/10">
-                    <span className="font-mono text-[8px] text-[#9b8b78] uppercase tracking-[0.25em]">
-                      Page {String(idx + 1).padStart(2, '0')} · {project.status.toUpperCase()}
-                    </span>
-
-                    <h3 className="text-2xl sm:text-3xl font-heading font-black leading-tight text-[#111111]">
-                      {project.name}
-                    </h3>
-
-                    <p className="text-xs text-[#6b6b6b] leading-relaxed font-sans line-clamp-3">
-                      {project.results || project.solution}
-                    </p>
-
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {project.techStack.slice(0, 4).map((tech) => (
-                        <span
-                          key={tech}
-                          className="tech-tag text-[9px] font-mono px-2 py-0.5 rounded-full text-[#111111]/70"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-
-                    <Link
-                      href={`/selected-work/${project.id}`}
-                      className="read-story mt-2 self-start text-[10px] font-mono font-bold uppercase tracking-wider text-[#111111] pb-0.5 hover:text-[#7C3AED] transition-colors"
-                    >
-                      Read Story →
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Corner page number */}
-                <span
-                  className="absolute bottom-3 right-5 font-mono text-[9px] text-[#9b8b78]"
-                  aria-hidden="true"
-                >
-                  {idx + 1}
-                </span>
-              </div>
-
-              {/* ── BACK FACE (what you see mid-flip) ── */}
-              <div
-                className="page-face page-back absolute inset-0"
-                style={{
-                  backfaceVisibility: 'hidden',
-                  WebkitBackfaceVisibility: 'hidden',
-                  transform: 'rotateY(180deg)',
-                  background: 'linear-gradient(135deg, #f0e9df 0%, #e8ddd0 100%)',
-                  borderRadius: '4px 0 0 4px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                {/* Paper grain on back */}
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    backgroundImage: `
-                      repeating-linear-gradient(
-                        transparent,
-                        transparent 31px,
-                        rgba(17,17,17,0.04) 31px,
-                        rgba(17,17,17,0.04) 32px
-                      )
-                    `,
-                    backgroundPositionY: '44px',
-                  }}
-                  aria-hidden="true"
-                />
-                <span className="font-mono text-[9px] text-[#9b8b78] uppercase tracking-widest rotate-180">
-                  — Flip —
-                </span>
-              </div>
-            </div>
+              project={project}
+              idx={idx}
+              totalCount={DISPLAY_PROJECTS.length}
+              addPageRef={addPageRef}
+            />
           )
         })}
       </div>

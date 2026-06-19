@@ -12,7 +12,6 @@ const SECTION_IDS = [
   'selected-work',
   'pause',
   'how-i-think',
-  'my-journey',
   'next-building',
   'connect',
 ]

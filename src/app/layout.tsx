@@ -1,29 +1,17 @@
+/* eslint-disable @next/next/no-page-custom-font */
 import type { Metadata } from 'next'
-import { Inter, Outfit, Fira_Code } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 import { NavBar } from '@/components/ui/NavBar'
 import { CustomCursor } from '@/components/ui/CustomCursor'
 import { FluidCanvas } from '@/components/ui/FluidCanvas'
 import { profile } from '@/data/profile'
+import { ThemeProvider } from '@/context/ThemeContext'
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-})
-
-const outfit = Outfit({
-  subsets: ['latin'],
-  variable: '--font-outfit',
-  display: 'swap',
-})
-
-const firaCode = Fira_Code({
-  subsets: ['latin'],
-  variable: '--font-fira-code',
-  display: 'swap',
-})
+const inter = { variable: 'font-inter' }
+const outfit = { variable: 'font-outfit' }
+const firaCode = { variable: 'font-fira-code' }
+const islandMoments = { variable: 'font-island-moments' }
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mukul-kumar.dev'
 
@@ -107,33 +95,54 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${outfit.variable} ${firaCode.variable} h-full antialiased`}
+      className={`${inter.variable} ${outfit.variable} ${firaCode.variable} ${islandMoments.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Inter:wght@100..900&family=Island+Moments&family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <meta name="theme-color" content="#f5efe8" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var saved = localStorage.getItem('theme');
+                  if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch (e) {}
+              })();
+            `
+          }}
+        />
       </head>
-      <body className="min-h-full bg-transparent text-[#111111] overflow-x-hidden">
-        {/* Global watery background — fixed behind all content */}
-        <FluidCanvas fixed />
-
+      <body className="min-h-full bg-transparent text-[#111111] dark:text-[#e5ded4] overflow-x-hidden">
         {/* Film grain overlay */}
         <div className="film-grain-overlay" aria-hidden="true" />
 
         {/* Gradient mesh overlay */}
         <div className="gradient-mesh" aria-hidden="true" />
 
-        <Providers>
-          {/* Unseen.co-style circular cursor */}
-          <CustomCursor />
-          <NavBar />
-          <main id="main-content">{children}</main>
-        </Providers>
+        <ThemeProvider>
+          {/* Global watery background — fixed behind all content */}
+          <FluidCanvas fixed />
+
+          <Providers>
+            {/* Unseen.co-style circular cursor */}
+            <CustomCursor />
+            <NavBar />
+            <main id="main-content">{children}</main>
+          </Providers>
+        </ThemeProvider>
       </body>
     </html>
   )

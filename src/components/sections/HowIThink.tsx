@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { SectionHeader } from '../ui/SectionHeader'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 const NODES = [
   {
@@ -43,6 +44,8 @@ export function HowIThink() {
   const sectionRef = useRef<HTMLDivElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
+  const detailsRef = useRef<HTMLDivElement>(null)
+  const prefersReducedMotion = useReducedMotion()
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger)
@@ -91,6 +94,16 @@ export function HowIThink() {
       triggers.forEach((t) => t.kill())
     }
   }, [])
+
+  // Animate the details shift on selection update
+  useEffect(() => {
+    if (!detailsRef.current) return
+    gsap.fromTo(
+      detailsRef.current,
+      { opacity: 0, y: prefersReducedMotion ? 0 : 15 },
+      { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }
+    )
+  }, [selectedNode, prefersReducedMotion])
 
   const selectedData = NODES.find((n) => n.id === selectedNode)
 
@@ -181,7 +194,7 @@ export function HowIThink() {
         </div>
 
         {/* Typographic details: NO cards, NO dashboard panels */}
-        <div className="mt-10 max-w-3xl mx-auto border-t border-[#111111]/10 pt-8 flex flex-col md:flex-row gap-8 items-start">
+        <div ref={detailsRef} className="mt-10 max-w-3xl mx-auto border-t border-[#111111]/10 pt-8 flex flex-col md:flex-row gap-8 items-start">
           <div className="w-full md:w-1/3 flex flex-col">
             <span className="font-mono text-[9px] uppercase tracking-widest text-[#6b6b6b]">Selected Subsystem</span>
             <span className="text-xl font-heading font-black text-[#111111] mt-1 uppercase">{selectedData?.label}</span>
