@@ -43,16 +43,16 @@ export function NotebookPage({ project, idx, totalCount, addPageRef }: NotebookP
           </div>
 
           {/* Right: project details */}
-          <div className="flex-1 flex flex-col justify-center gap-3 md:pl-6 md:border-l border-[#111111]/10">
+          <div className="flex-1 flex flex-col justify-center gap-3 md:pl-6 md:border-l border-border">
             <span className="font-mono text-[8px] text-[#9b8b78] uppercase tracking-[0.25em]">
               Page {String(idx + 1).padStart(2, '0')} · {project.status.toUpperCase()}
             </span>
 
-            <h3 className="text-2xl sm:text-3xl font-heading font-black leading-tight text-[#111111]">
+            <h3 className="text-2xl sm:text-3xl font-heading font-black leading-tight text-primary">
               {project.name}
             </h3>
 
-            <p className="text-xs text-[#6b6b6b] leading-relaxed font-sans line-clamp-3">
+            <p className="text-xs text-muted leading-relaxed font-sans line-clamp-3">
               {project.results || project.solution}
             </p>
 
@@ -69,7 +69,7 @@ export function NotebookPage({ project, idx, totalCount, addPageRef }: NotebookP
 
             <Link
               href={`/selected-work/${project.id}`}
-              className="read-story mt-2 self-start text-[10px] font-mono font-bold uppercase tracking-wider text-[#111111] pb-0.5 hover:text-[#7C3AED] transition-colors"
+              className="read-story mt-2 self-start text-[10px] font-mono font-bold uppercase tracking-wider text-primary pb-0.5 hover:text-[#7C3AED] transition-colors"
             >
               Read Story →
             </Link>

@@ -32,8 +32,7 @@ export function CustomCursor() {
       return
     }
 
-    // Hide native cursor site-wide
-    document.documentElement.style.cursor = 'none'
+    // Add class to activate custom cursor style hiding via CSS
     document.documentElement.classList.add('custom-cursor-active')
 
     gsap.set(dot, { xPercent: -50, yPercent: -50, opacity: 0 })
@@ -64,57 +63,6 @@ export function CustomCursor() {
       isVisible = false
     }
 
-    // ── Hover states ──────────────────────────────────────────────
-
-    const enterLink = () => {
-      gsap.to(ring, {
-        scale: 1.3,
-        borderWidth: '1.5px',
-        duration: 0.28,
-        ease: 'power2.out',
-      })
-      gsap.to(dot, { scale: 0.4, duration: 0.2, ease: 'power2.out' })
-    }
-
-    const leaveLink = () => {
-      gsap.to(ring, {
-        scale: 1,
-        borderWidth: '1px',
-        duration: 0.28,
-        ease: 'power2.out',
-      })
-      gsap.to(dot, { scale: 1, duration: 0.2, ease: 'power2.out' })
-    }
-
-    // cursor-label: show text inside a big pill
-    const enterLabel = (e: Event) => {
-      const el = e.currentTarget as HTMLElement
-      const text = el.dataset.cursorLabel ?? 'View'
-      setLabelText(text)
-      setIsLabeling(true)
-      gsap.to(ring, {
-        scale: 2.2,
-        borderWidth: '0px',
-        backgroundColor: 'rgba(255,255,255,1)',
-        duration: 0.38,
-        ease: 'power3.out',
-      })
-      gsap.to(dot, { scale: 0, duration: 0.2 })
-    }
-
-    const leaveLabel = () => {
-      setLabelText('')
-      setIsLabeling(false)
-      gsap.to(ring, {
-        scale: 1,
-        borderWidth: '1px',
-        backgroundColor: 'rgba(255,255,255,0)',
-        duration: 0.32,
-        ease: 'power3.out',
-      })
-      gsap.to(dot, { scale: 1, duration: 0.2 })
-    }
-
     // Dynamic context labels based on element type.
     // Elements with data-cursor-no-label="true" are skipped entirely.
     const getContextLabel = (el: HTMLElement): string => {
@@ -131,72 +79,82 @@ export function CustomCursor() {
       return ''
     }
 
-    const enterInteractive = (e: Event) => {
-      const el = e.currentTarget as HTMLElement
-      const label = getContextLabel(el)
-      if (label) {
-        setLabelText(label)
-        setIsLabeling(true)
-        gsap.to(ring, {
-          scale: 1.8,
-          borderWidth: '0px',
-          backgroundColor: 'rgba(255,255,255,0.95)',
-          duration: 0.3,
-          ease: 'power3.out',
-        })
-        gsap.to(dot, { scale: 0, duration: 0.2 })
-      } else {
-        enterLink()
+    // ── Event Delegation for Hover states ─────────────────────────────
+
+    const handleMouseOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      if (!target) return
+      const el = target.closest(
+        'a, button, [role="button"], input, textarea, select, .interactive-3d, .tech-icon, .nav-link, [data-cursor-label]'
+      ) as HTMLElement | null
+
+      if (el) {
+        const label = getContextLabel(el)
+        if (label) {
+          setLabelText(label)
+          setIsLabeling(true)
+          gsap.to(ring, {
+            scale: 1.8,
+            borderWidth: '0px',
+            backgroundColor: 'rgba(255,255,255,0.95)',
+            duration: 0.3,
+            ease: 'power3.out',
+          })
+          gsap.to(dot, { scale: 0, duration: 0.2 })
+        } else {
+          // Normal link hover
+          gsap.to(ring, {
+            scale: 1.3,
+            borderWidth: '1.5px',
+            duration: 0.28,
+            ease: 'power2.out',
+          })
+          gsap.to(dot, { scale: 0.4, duration: 0.2, ease: 'power2.out' })
+        }
       }
     }
 
-    const leaveInteractive = (e: Event) => {
-      const el = e.currentTarget as HTMLElement
-      if (el.dataset.cursorLabel || getContextLabel(el)) {
-        leaveLabel()
-      } else {
-        leaveLink()
+    const handleMouseOut = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      if (!target) return
+      const el = target.closest(
+        'a, button, [role="button"], input, textarea, select, .interactive-3d, .tech-icon, .nav-link, [data-cursor-label]'
+      ) as HTMLElement | null
+
+      if (el) {
+        if (el.dataset.cursorLabel || getContextLabel(el)) {
+          setLabelText('')
+          setIsLabeling(false)
+          gsap.to(ring, {
+            scale: 1,
+            borderWidth: '1px',
+            backgroundColor: 'rgba(255,255,255,0)',
+            duration: 0.32,
+            ease: 'power3.out',
+          })
+          gsap.to(dot, { scale: 1, duration: 0.2 })
+        } else {
+          gsap.to(ring, {
+            scale: 1,
+            borderWidth: '1px',
+            duration: 0.28,
+            ease: 'power2.out',
+          })
+          gsap.to(dot, { scale: 1, duration: 0.2, ease: 'power2.out' })
+        }
       }
     }
 
-    // ── Bind all interactive elements ─────────────────────────────
-
-    const bindAll = () => {
-      const links = document.querySelectorAll<HTMLElement>(
-        'a, button, [role="button"], input, textarea, select, .interactive-3d, .tech-icon, .nav-link'
-      )
-      const labelEls = document.querySelectorAll<HTMLElement>('[data-cursor-label]')
-
-      links.forEach((el) => {
-        el.removeEventListener('mouseenter', enterInteractive)
-        el.removeEventListener('mouseleave', leaveInteractive)
-        el.addEventListener('mouseenter', enterInteractive)
-        el.addEventListener('mouseleave', leaveInteractive)
-        ;(el as HTMLElement).style.cursor = 'none'
-      })
-
-      labelEls.forEach((el) => {
-        el.removeEventListener('mouseenter', enterLabel)
-        el.removeEventListener('mouseleave', leaveLabel)
-        el.addEventListener('mouseenter', enterLabel)
-        el.addEventListener('mouseleave', leaveLabel)
-        ;(el as HTMLElement).style.cursor = 'none'
-      })
-    }
-
-    bindAll()
-
-    const observer = new MutationObserver(bindAll)
-    observer.observe(document.body, { childList: true, subtree: true })
-
+    window.addEventListener('mouseover', handleMouseOver)
+    window.addEventListener('mouseout', handleMouseOut)
     window.addEventListener('mousemove', onMouseMove)
     document.addEventListener('mouseleave', onMouseLeaveWindow)
 
     return () => {
       window.removeEventListener('mousemove', onMouseMove)
       document.removeEventListener('mouseleave', onMouseLeaveWindow)
-      observer.disconnect()
-      document.documentElement.style.cursor = ''
+      window.removeEventListener('mouseover', handleMouseOver)
+      window.removeEventListener('mouseout', handleMouseOut)
       document.documentElement.classList.remove('custom-cursor-active')
     }
   }, [])

@@ -11,7 +11,7 @@ import { MukulLogo } from './MukulLogo'
 const navItems = [
   { label: 'Skills', href: '#skills', id: 'skills' },
   { label: 'Selected Work', href: '#selected-work', id: 'selected-work' },
-  { label: 'Thinking', href: '#how-i-think', id: 'how-i-think' },
+  { label: 'Highlights', href: '#engineering-highlights', id: 'engineering-highlights' },
   { label: 'Next', href: '#next-building', id: 'next-building' },
   { label: 'Connect', href: '#connect', id: 'connect' },
 ]
@@ -72,6 +72,7 @@ export function NavBar() {
 
           {/* Controls section (Theme toggle + Status / Hamburger) */}
           <div className="flex items-center gap-4 sm:gap-6 pointer-events-auto">
+
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}

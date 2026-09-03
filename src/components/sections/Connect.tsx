@@ -12,6 +12,7 @@ import { revealOnScroll } from '@/lib/animations'
 import { ContactForm } from '../ui/ContactForm'
 import { StatusCard } from '../ui/StatusCard'
 import { QuickLinksCard } from '../ui/QuickLinksCard'
+import { VisitorCounter } from '../ui/VisitorCounter'
 
 export function Connect() {
   const [copied, setCopied] = useState(false)
@@ -108,6 +109,7 @@ export function Connect() {
         {/* Footer */}
         <div className="mt-20 pt-8 border-t border-[#111111]/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] font-mono text-[#6b6b6b]">
           <span>© {new Date().getFullYear()} {profile.name}. Narrative engineering story.</span>
+          <VisitorCounter />
           <span>Designed &amp; developed with care.</span>
         </div>
       </div>

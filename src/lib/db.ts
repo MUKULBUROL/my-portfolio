@@ -1,6 +1,8 @@
 import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import pg from 'pg'
+import { projects as staticProjects } from '@/data/projects'
+import type { ProjectItem } from '@/types'
 
 const connectionString = process.env.DATABASE_URL
 
@@ -22,3 +24,47 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 export { prisma }
+
+export async function getProjectById(id: string): Promise<ProjectItem | null> {
+  // First check static projects
+  const staticProj = staticProjects.find((p) => p.id === id)
+  if (staticProj) {
+    return staticProj
+  }
+
+  // Fallback to database
+  const dbUrl = process.env.DATABASE_URL
+  if (dbUrl && !dbUrl.includes('johndoe')) {
+    try {
+      const p = await prisma.project.findUnique({
+        where: { id },
+      })
+      if (p) {
+        return {
+          id: p.id,
+          name: p.title,
+          tagline: p.description.slice(0, 80) + '...',
+          description: p.description,
+          problem: p.problem,
+          solution: p.results,
+          architecture: p.architecture,
+          challenges: p.challenges,
+          results: p.results,
+          metrics: p.metrics ? [p.metrics] : [],
+          techStack: p.techStack,
+          tags: p.techStack.slice(0, 3),
+          githubUrl: p.githubUrl || undefined,
+          liveUrl: p.liveUrl || undefined,
+          imageUrl: p.imageUrl || undefined,
+          featured: p.featured,
+          status: 'production',
+          lessonsLearned: '',
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching project from DB by ID:', err)
+    }
+  }
+
+  return null
+}

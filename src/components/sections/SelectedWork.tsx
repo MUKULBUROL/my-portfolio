@@ -97,21 +97,21 @@ export function SelectedWork({ initialProjects }: SelectedWorkProps) {
     >
       {/* Section label */}
       <div className="absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-3 z-20 select-none">
-        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-[#6b6b6b]">02</span>
-        <div className="w-16 h-px bg-[#111111]/15" />
-        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-[#6b6b6b]">Selected Work</span>
-        <div className="w-16 h-px bg-[#111111]/15" />
-        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-[#6b6b6b] hidden sm:inline">
+        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-muted">02</span>
+        <div className="w-16 h-px bg-border" />
+        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-muted">Selected Work</span>
+        <div className="w-16 h-px bg-border" />
+        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-muted hidden sm:inline">
           Scroll to flip pages
         </span>
       </div>
 
       {/* Section heading */}
       <div className="absolute top-14 left-1/2 -translate-x-1/2 text-center z-20 select-none pointer-events-none">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-heading font-black tracking-tight text-[#111111]">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-heading font-black tracking-tight text-primary">
           Systems I&apos;ve Built
         </h2>
-        <p className="mt-2 text-xs sm:text-sm text-[#6b6b6b] font-sans max-w-md mx-auto">
+        <p className="mt-2 text-xs sm:text-sm text-muted font-sans max-w-md mx-auto">
           High-performance backends, AI pipelines, and scalable architectures — from hackathons to production.
         </p>
       </div>
@@ -180,9 +180,9 @@ export function SelectedWork({ initialProjects }: SelectedWorkProps) {
       </div>
 
       {/* Scroll hint */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 text-[#6b6b6b] select-none pointer-events-none z-20">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 text-muted select-none pointer-events-none z-20">
         <span className="text-[8px] font-mono uppercase tracking-[0.25em]">Scroll to turn pages</span>
-        <div className="w-px h-6 bg-gradient-to-b from-[#6b6b6b] to-transparent animate-pulse" />
+        <div className="w-px h-6 bg-gradient-to-b from-muted to-transparent animate-pulse" />
       </div>
     </section>
   )

@@ -2,7 +2,7 @@ import { Hero } from '@/components/sections/Hero'
 import { Skills } from '@/components/sections/Skills'
 import { SelectedWork } from '@/components/sections/SelectedWork'
 import { Pause } from '@/components/sections/Pause'
-import { HowIThink } from '@/components/sections/HowIThink'
+import { EngineeringHighlights } from '@/components/sections/EngineeringHighlights'
 import { WhatImBuildingNext } from '@/components/sections/WhatImBuildingNext'
 import { Connect } from '@/components/sections/Connect'
 import { InteractiveSVGDivider } from '@/components/ui/InteractiveSVGDivider'
@@ -66,7 +66,7 @@ export default async function HomePage() {
 
       <InteractiveSVGDivider />
 
-      <HowIThink />
+      <EngineeringHighlights />
 
       <InteractiveSVGDivider />
 

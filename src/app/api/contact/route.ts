@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import { z } from 'zod'
+import { rateLimit } from '@/lib/rateLimit'
 
 function escapeHtml(str: string): string {
   return str
@@ -9,6 +11,13 @@ function escapeHtml(str: string): string {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;')
 }
+
+const contactSchema = z.object({
+  name: z.string().min(1, 'Name is required.').max(100, 'Name is too long.').trim(),
+  email: z.string().email('Invalid email address.').max(255, 'Email is too long.').trim(),
+  subject: z.string().max(150, 'Subject is too long.').trim().optional(),
+  message: z.string().min(1, 'Message is required.').max(5000, 'Message is too long.').trim(),
+})
 
 function getResendClient() {
   const apiKey = process.env.RESEND_API_KEY
@@ -20,33 +29,34 @@ function getResendClient() {
 
 export async function POST(req: NextRequest) {
   try {
+    // 1. Rate Limiting: Max 5 contact form submissions per 5 minutes per IP
+    const { success } = rateLimit(req, 5, 300000)
+    if (!success) {
+      return NextResponse.json(
+        { error: 'Too many messages sent. Please wait a few minutes before trying again.' },
+        { status: 429 }
+      )
+    }
+
+    // 2. Input Validation via Zod
     const body = await req.json()
-    const { name, email, subject, message } = body as {
-      name?: string
-      email?: string
-      subject?: string
-      message?: string
-    }
-
-    if (!name || !email || !message) {
+    const result = contactSchema.safeParse(body)
+    if (!result.success) {
+      const errorMsg = result.error.issues.map((issue) => issue.message).join(' ')
       return NextResponse.json(
-        { error: 'Name, email, and message are required.' },
+        { error: errorMsg },
         { status: 400 }
       )
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Invalid email address.' },
-        { status: 400 }
-      )
-    }
+    const { name, email, subject, message } = result.data
 
-    const safeName = escapeHtml(name.trim())
-    const safeEmail = escapeHtml(email.trim())
-    const safeSubject = escapeHtml((subject || '').trim())
-    const safeMessage = escapeHtml(message.trim())
+    const safeName = escapeHtml(name)
+    const safeEmail = escapeHtml(email)
+    const safeSubject = escapeHtml(subject || '')
+      .replace(/[\r\n]+/g, ' ')
+      .trim()
+    const safeMessage = escapeHtml(message)
 
     const resend = getResendClient()
 
@@ -75,7 +85,7 @@ export async function POST(req: NextRequest) {
             </tr>
           </table>
           <div style="background: #f9f9f9; border-left: 3px solid #111; padding: 15px; margin: 20px 0;">
-            <p style="color: #111; margin: 0; line-height: 1.6;">${safeMessage}</p>
+            <p style="color: #111; margin: 0; line-height: 1.6; white-space: pre-wrap;">${safeMessage}</p>
           </div>
           <p style="color: #999; font-size: 12px; margin-top: 30px;">
             Sent from your portfolio contact form

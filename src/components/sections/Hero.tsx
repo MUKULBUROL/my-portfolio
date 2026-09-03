@@ -1,11 +1,10 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { MagneticButton } from '../ui/MagneticButton'
 import { ArrowRight, ChevronDown, Download, Mail, GraduationCap, MapPin } from 'lucide-react'
-import { profile } from '@/data/profile'
 import { resume } from '@/data/resume'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { TechMarquee } from '../ui/TechMarquee'
@@ -24,7 +23,19 @@ export function Hero() {
   const scrollRef = useRef<HTMLDivElement>(null)
   const photoRef = useRef<HTMLDivElement>(null)
   const metadataRef = useRef<HTMLDivElement>(null)
+  const glowRef = useRef<HTMLDivElement>(null)
   const prefersReducedMotion = useReducedMotion()
+  const [copied, setCopied] = useState(false)
+
+  const handleCopyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText('mukulburoli@gmail.com')
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy email: ', err)
+    }
+  }
 
   useEffect(() => {
     if (prefersReducedMotion) {
@@ -63,9 +74,9 @@ export function Hero() {
         .to('.title-word', { y: '0%', duration: 0.8, stagger: 0.08, ease: 'power4.out' }, '-=0.2')
         .to(underlineRef.current, { scaleX: 1, opacity: 1, transformOrigin: 'left center', duration: 0.8, ease: 'power2.inOut' }, '-=0.2')
         .to(descRef.current, { y: 0, opacity: 1, duration: 0.4 }, '-=0.3')
+        .to(ctaRef.current, { y: 0, opacity: 1, duration: 0.4 }, '-=0.2')
         .to(metadataRef.current, { y: 0, opacity: 1, duration: 0.4 }, '-=0.3')
         .to(techRef.current, { y: 0, opacity: 1, duration: 0.4 }, '-=0.2')
-        .to(ctaRef.current, { y: 0, opacity: 1, duration: 0.4 }, '-=0.2')
         .to(scrollRef.current, { opacity: 1, duration: 0.3 }, '-=0.1')
 
       // Gentle floating animation on photo — continuous
@@ -82,6 +93,80 @@ export function Hero() {
     })
 
     return () => ctx.revert()
+  }, [prefersReducedMotion])
+
+  useEffect(() => {
+    const container = containerRef.current
+    const glow = glowRef.current
+    if (!container || !glow || prefersReducedMotion) return
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = container.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+
+      gsap.to(glow, {
+        x,
+        y,
+        opacity: 1,
+        duration: 0.8,
+        ease: 'power2.out',
+      })
+    }
+
+    const handleMouseLeave = () => {
+      gsap.to(glow, {
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power2.out',
+      })
+    }
+
+    container.addEventListener('mousemove', handleMouseMove)
+    container.addEventListener('mouseleave', handleMouseLeave)
+
+    return () => {
+      container.removeEventListener('mousemove', handleMouseMove)
+      container.removeEventListener('mouseleave', handleMouseLeave)
+    }
+  }, [prefersReducedMotion])
+
+  useEffect(() => {
+    if (prefersReducedMotion) return
+
+    const words = document.querySelectorAll('.title-word')
+
+    const onEnter = (e: Event) => {
+      const el = e.currentTarget as HTMLElement
+      gsap.to(el, {
+        y: -6,
+        scale: 1.03,
+        duration: 0.3,
+        ease: 'power2.out',
+      })
+    }
+
+    const onLeave = (e: Event) => {
+      const el = e.currentTarget as HTMLElement
+      gsap.to(el, {
+        y: 0,
+        scale: 1,
+        duration: 0.4,
+        ease: 'power3.out',
+      })
+    }
+
+    words.forEach((word) => {
+      word.addEventListener('mouseenter', onEnter)
+      word.addEventListener('mouseleave', onLeave)
+    })
+
+    return () => {
+      words.forEach((word) => {
+        word.removeEventListener('mouseenter', onEnter)
+        word.removeEventListener('mouseleave', onLeave)
+      })
+    }
   }, [prefersReducedMotion])
 
   useEffect(() => {
@@ -154,6 +239,14 @@ export function Hero() {
         <div className="hero-mesh-accent" />
       </div>
 
+      {/* Interactive Cursor Follow Glow */}
+      <div
+        ref={glowRef}
+        className="absolute pointer-events-none blur-[120px] rounded-full w-[380px] h-[380px] bg-gradient-to-tr from-[#966d3a]/12 to-[#7C3AED]/12 dark:from-[#d4b483]/8 dark:to-[#7C3AED]/8 opacity-0 transition-opacity duration-700 ease-out z-0"
+        style={{ transform: 'translate(-50%, -50%)', left: 0, top: 0 }}
+        aria-hidden="true"
+      />
+
       {/* Main asymmetric layout */}
       <div className="relative z-10 max-w-6xl mx-auto px-8 sm:px-12 md:px-16 w-full py-16 flex flex-col md:flex-row items-center justify-between gap-12 min-h-[85vh]">
 
@@ -199,55 +292,18 @@ export function Hero() {
           </div>
 
           {/* Updated Description */}
-          <div ref={descRef} className="mb-8 opacity-0">
+          <div ref={descRef} className="mb-6 opacity-0">
             <p className="text-[#111111]/80 dark:text-[#e5ded4]/80 font-normal text-base sm:text-lg leading-relaxed font-sans max-w-lg">
               I build high-performance systems, <span className="text-[#966d3a] dark:text-[#d4b483] font-semibold">AI pipelines</span>, and infrastructure that power real products.
             </p>
           </div>
 
-          {/* Metadata Cards */}
-          <div
-            ref={metadataRef}
-            className="flex flex-col sm:flex-row items-stretch sm:items-center gap-6 sm:gap-8 mb-10 opacity-0 w-full"
-          >
-            {/* Card 1: Education */}
-            <div className="flex items-center gap-4 flex-1">
-              <div className="flex-shrink-0 w-11 h-11 rounded-full border border-[#111111]/8 dark:border-[#e5ded4]/12 bg-[#fcfaf7]/50 dark:bg-[#1e1b19]/50 flex items-center justify-center text-[#111111] dark:text-[#e5ded4] shadow-sm">
-                <GraduationCap size={18} className="stroke-[1.5]" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-sans font-semibold text-sm text-[#111111] dark:text-[#e5ded4]">Software Engineer</span>
-                <span className="font-sans text-xs text-[#555555] dark:text-[#cccccc]">IIT Hyderabad &apos;26</span>
-              </div>
-            </div>
-
-            {/* Vertical Separator */}
-            <div className="hidden sm:block w-[1px] h-8 bg-[#111111]/10 dark:bg-[#e5ded4]/15" />
-
-            {/* Card 2: Location & Availability */}
-            <div className="flex items-center gap-4 flex-1">
-              <div className="flex-shrink-0 w-11 h-11 rounded-full border border-[#111111]/8 dark:border-[#e5ded4]/12 bg-[#fcfaf7]/50 dark:bg-[#1e1b19]/50 flex items-center justify-center text-[#111111] dark:text-[#e5ded4] shadow-sm">
-                <MapPin size={18} className="stroke-[1.5]" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-sans font-semibold text-sm text-[#111111] dark:text-[#e5ded4]">Based in India</span>
-                <span className="font-serif italic text-xs text-[#966d3a] dark:text-[#d4b483]">Open for meaningful work.</span>
-                <span className="font-sans text-[10px] text-[#555555] dark:text-[#cccccc] mt-0.5">mukulburoli@gmail.com</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Tech Stack Marquee */}
-          <div ref={techRef} className="w-full max-w-md mb-10 opacity-0">
-            <TechMarquee />
-          </div>
-
           {/* CTA Buttons */}
-          <div ref={ctaRef} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 opacity-0">
+          <div ref={ctaRef} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mb-8 opacity-0 w-full sm:w-auto">
             <MagneticButton
               onClick={() => scrollToSection('skills')}
               data-cursor-label="Explore"
-              className="cta-button px-8 py-4 bg-[#111111] hover:bg-[#222222] text-[#f5efe8] rounded-full text-xs font-mono font-semibold tracking-wide flex items-center justify-center gap-2 group"
+              className="cta-button px-8 py-4 bg-[#111111] hover:bg-[#222222] dark:bg-[#e5ded4] dark:hover:bg-[#fcfaf7] text-[#f5efe8] dark:text-[#111111] rounded-full text-xs font-mono font-semibold tracking-wide flex items-center justify-center gap-2 group"
               aria-label="View selected work"
             >
               <span>View Selected Work</span>
@@ -258,7 +314,7 @@ export function Hero() {
               href={resume.pdfPath}
               target="_blank"
               rel="noopener noreferrer"
-              className="cta-button-outline px-6 py-4 border-2 border-[#111111] hover:bg-[#111111] hover:text-[#f5efe8] text-[#111111] rounded-full text-xs font-mono font-semibold tracking-wide flex items-center justify-center gap-2"
+              className="cta-button-outline px-6 py-4 border-2 border-[#111111] dark:border-[#e5ded4]/30 hover:bg-[#111111] hover:text-[#f5efe8] dark:hover:bg-[#e5ded4] dark:hover:text-[#111111] text-[#111111] dark:text-[#e5ded4] rounded-full text-xs font-mono font-semibold tracking-wide flex items-center justify-center gap-2"
             >
               <Download size={12} />
               <span>Resume</span>
@@ -267,17 +323,71 @@ export function Hero() {
             <MagneticButton
               onClick={() => scrollToSection('connect')}
               data-cursor-label="Connect"
-              className="cta-button-outline px-6 py-4 border-2 border-[#111111] hover:bg-[#111111] hover:text-[#f5efe8] text-[#111111] rounded-full text-xs font-mono font-semibold tracking-wide flex items-center justify-center gap-2"
+              className="cta-button-outline px-6 py-4 border-2 border-[#111111] dark:border-[#e5ded4]/30 hover:bg-[#111111] hover:text-[#f5efe8] dark:hover:bg-[#e5ded4] dark:hover:text-[#111111] text-[#111111] dark:text-[#e5ded4] rounded-full text-xs font-mono font-semibold tracking-wide flex items-center justify-center gap-2"
               aria-label="Let's talk"
             >
               <Mail size={12} />
               <span>Let&apos;s Talk</span>
             </MagneticButton>
           </div>
+
+          {/* End of Left Column Content */}
         </div>
 
-        {/* ── Right column: photo ── */}
-        <HeroAvatar ref={photoRef} />
+        {/* ── Right column: photo, metadata & tech stack ── */}
+        <div className="flex flex-col items-center w-full md:w-auto flex-shrink-0 order-1 md:order-2 md:-mt-16 gap-6 select-none">
+          <HeroAvatar ref={photoRef} />
+
+          {/* Metadata Card */}
+          <div
+            ref={metadataRef}
+            className="w-full max-w-[320px] opacity-0 mt-2 border border-[#111111]/5 dark:border-[#e5ded4]/8 bg-[#fcfaf7]/30 dark:bg-[#1e1b19]/30 backdrop-blur-md p-4 rounded-[1.75rem] shadow-sm space-y-3.5 hover:border-[#966d3a]/20 dark:hover:border-[#d4b483]/20 transition-all duration-300"
+          >
+            {/* Education Row */}
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full border border-[#111111]/5 dark:border-[#e5ded4]/8 bg-[#fcfaf7] dark:bg-[#111111] flex items-center justify-center text-[#966d3a] dark:text-[#d4b483] shadow-sm flex-shrink-0">
+                <GraduationCap size={14} className="stroke-[1.5]" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-sans font-semibold text-xs text-[#111111] dark:text-[#e5ded4]">Software Engineer</span>
+                <span className="font-sans text-[10px] text-[#555555] dark:text-[#cccccc]">IIT Hyderabad &apos;26</span>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="h-[1px] bg-[#111111]/5 dark:bg-[#e5ded4]/8" />
+
+            {/* Location & Availability Row */}
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-full border border-[#111111]/5 dark:border-[#e5ded4]/8 bg-[#fcfaf7] dark:bg-[#111111] flex items-center justify-center text-[#966d3a] dark:text-[#d4b483] shadow-sm flex-shrink-0 mt-0.5">
+                <MapPin size={14} className="stroke-[1.5]" />
+              </div>
+              <div className="flex flex-col items-start">
+                <span className="font-sans font-semibold text-xs text-[#111111] dark:text-[#e5ded4]">
+                  Based in India
+                  <span className="font-serif italic text-[10px] text-[#966d3a] dark:text-[#d4b483] ml-1.5 font-normal">Open for work</span>
+                </span>
+                <button
+                  onClick={handleCopyEmail}
+                  className="group/email flex items-center gap-1.5 mt-0.5 focus:outline-none focus-visible:ring-1 focus-visible:ring-[#966d3a] rounded px-1 -mx-1"
+                  title="Copy email to clipboard"
+                  aria-label="Copy email address"
+                >
+                  <span className={`font-sans text-[9px] tracking-wide transition-all duration-300 font-medium ${
+                    copied ? 'text-emerald-600 dark:text-emerald-400 font-bold scale-102' : 'text-[#555555] dark:text-[#cccccc] group-hover/email:text-[#966d3a] dark:group-hover/email:text-[#d4b483]'
+                  }`}>
+                    {copied ? 'Email Copied! ✓' : 'mukulburoli@gmail.com'}
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Tech Stack Marquee */}
+          <div ref={techRef} className="w-full max-w-[320px] opacity-0">
+            <TechMarquee />
+          </div>
+        </div>
       </div>
 
       {/* Scroll indicator */}

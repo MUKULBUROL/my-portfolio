@@ -232,18 +232,28 @@ const marqueeItems = [
 ]
 
 export function TechMarquee() {
+  const handleScrollToSkills = () => {
+    document.getElementById('skills')?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   return (
     <div className="tech-marquee" aria-label="Technical skills marquee scroller">
       <div className="tech-marquee-track">
         {[...marqueeItems, ...marqueeItems].map((tech, i) => (
-          <div key={`${tech.name}-${i}`} className="tech-marquee-item">
+          <button
+            key={`${tech.name}-${i}`}
+            onClick={handleScrollToSkills}
+            className="tech-marquee-item bg-transparent border-none p-0 cursor-pointer focus:outline-none focus-visible:scale-105 text-left"
+            title={`View ${tech.name} in skills section`}
+            aria-label={`View ${tech.name} details`}
+          >
             <div className="tech-marquee-icon">
               {tech.icon}
             </div>
-            <span className="text-[11px] font-mono text-[#111111] tracking-wide font-bold opacity-80">
+            <span className="text-[11px] font-mono text-[#111111] dark:text-[#e5ded4] tracking-wide font-bold opacity-80">
               {tech.name}
             </span>
-          </div>
+          </button>
         ))}
       </div>
     </div>

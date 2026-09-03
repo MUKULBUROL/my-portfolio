@@ -11,10 +11,7 @@ async function main() {
   console.log('Seeding database with real projects...')
 
   // Clean existing tables
-  await prisma.message.deleteMany({})
   await prisma.project.deleteMany({})
-  await prisma.blogPost.deleteMany({})
-  await prisma.user.deleteMany({})
 
   // 1. Create Real Projects
   await prisma.project.create({
@@ -68,20 +65,7 @@ async function main() {
     },
   })
 
-  // 2. Create Blog Posts
-  await prisma.blogPost.create({
-    data: {
-      title: 'Next.js 15 App Router Security Best Practices',
-      slug: 'nextjs-15-security-best-practices',
-      summary: 'Learn how to secure Next.js 15 server action endpoints, configure custom CSP headers for inline scripts, and audit input validations using Zod.',
-      content: `## Next.js 15 Security Deep Dive`,
-      tags: ['Security', 'Next.js', 'Web Development'],
-      published: true,
-      views: 1024,
-      readingTime: 6,
-      publishedAt: new Date(),
-    },
-  })
+
 
   console.log('Database successfully seeded with portfolio data!')
 }
