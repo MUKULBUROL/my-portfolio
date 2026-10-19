@@ -140,7 +140,7 @@ export function Connect() {
 
         {/* Bottom Footer Credits & Replay Control */}
         <div className="mt-16 pt-6 border-t-2.5 border-[#121212] flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs font-bold text-[#121212]">
-          <span>© {new Date().getFullYear()} Mukul Kumar. Editorial Brutalist Systems Portfolio.</span>
+          <span>© {new Date().getFullYear()} Mukul Kumar</span>
           <div className="flex items-center gap-4">
             <button
               type="button"
