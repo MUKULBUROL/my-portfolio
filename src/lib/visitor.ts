@@ -26,7 +26,7 @@ function getFallbackFilePath(): string {
     fs.writeFileSync(testFile, 'test')
     fs.unlinkSync(testFile)
     return localPath
-  } catch (e) {
+  } catch {
     // If local project directory is read-only (e.g., Vercel / serverless), write to OS temp dir
     return path.join(os.tmpdir(), 'new-portfolio-visitor-stats.json')
   }
@@ -70,8 +70,9 @@ function updateFallbackStats(stats: VisitorStatsData) {
     if (fs.existsSync(path.dirname(FALLBACK_FILE_PATH))) {
       fs.writeFileSync(FALLBACK_FILE_PATH, JSON.stringify(stats, null, 2))
     }
-  } catch (err: any) {
-    console.warn('Error writing fallback stats file:', err.message)
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.warn('Error writing fallback stats file:', msg)
   }
 }
 

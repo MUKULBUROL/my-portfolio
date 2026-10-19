@@ -2,53 +2,37 @@ import type { SkillCategory } from '@/types'
 
 export const skillCategories: SkillCategory[] = [
   {
-    name: 'Languages',
-    color: '#7C3AED',
+    name: 'Languages & Core',
+    color: '#FF5C35',
     skills: [
-      { name: 'C++', proficiency: 5, highlighted: true, description: 'System level programming, SDV wrapper classes, latency optimization' },
-      { name: 'Java', proficiency: 5, highlighted: true, description: 'Backend service development, Spring Boot, OOP principles' },
-      { name: 'Python', proficiency: 5, highlighted: true, description: 'FastAPI, AI orchestrations, document ingestion, data processing' },
-      { name: 'SQL', proficiency: 4, description: 'MySQL, PostgreSQL, normalized schemas, complex queries' },
+      { name: 'C++', proficiency: 5, highlighted: true, description: 'Systems programming, VSOMEIP, Protobuf, KUKSA middleware' },
+      { name: 'Java', proficiency: 5, highlighted: true, description: 'Spring Boot, Spring Data JPA, settlement algorithms, REST' },
+      { name: 'Python', proficiency: 5, highlighted: true, description: 'FastAPI, vector embeddings, Gemini API integration, LLM pipelines' },
+      { name: 'TypeScript', proficiency: 5, highlighted: true, description: 'Node.js, full-stack application logic, Jest test suites' },
+      { name: 'SQL', proficiency: 5, highlighted: true, description: 'Relational data modeling, schema normalization, ACID safety' },
     ],
   },
   {
-    name: 'Backend & Distributed',
-    color: '#06B6D4',
+    name: 'Backend & Systems',
+    color: '#38BDF8',
     skills: [
-      { name: 'Spring Boot', proficiency: 5, highlighted: true, description: 'REST APIs, service-repository architecture, Spring Data JPA' },
-      { name: 'FastAPI', proficiency: 5, highlighted: true, description: 'Async REST endpoints, semantic search pipelines' },
-      { name: 'Node.js & Express.js', proficiency: 4, description: 'Backend development, middleware, REST APIs' },
-      { name: 'gRPC & Protobuf', proficiency: 4, description: 'High-performance real-time RPC services, type-safe serialization' },
-      { name: 'WebSockets & SOME/IP', proficiency: 4, description: 'Real-time bidirectional communication, automotive middleware' },
+      { name: 'Spring Boot', proficiency: 5, highlighted: true, description: 'Service-repository architecture, transactional isolation, REST APIs' },
+      { name: 'FastAPI', proficiency: 5, highlighted: true, description: 'High-performance async API services, document ingestion' },
+      { name: 'Node.js', proficiency: 5, highlighted: true, description: 'Server-side runtime, metadata reconciliation pipelines' },
+      { name: 'REST APIs', proficiency: 5, highlighted: true, description: 'Stateless endpoints, defensive serialization, error contracts' },
+      { name: 'MySQL & PostgreSQL', proficiency: 5, highlighted: true, description: 'Structured storage, indexing, query execution' },
     ],
   },
   {
-    name: 'Developer Tools',
-    color: '#F59E0B',
+    name: 'Protocols, Tools & Testing',
+    color: '#A3E635',
     skills: [
-      { name: 'Docker', proficiency: 4, highlighted: true, description: 'Containerization, environment isolation, deployment' },
-      { name: 'Linux', proficiency: 4, description: 'Process management, networking, bash scripting' },
-      { name: 'Git & GitHub', proficiency: 5, description: 'Version control, code collaboration, reviews' },
-      { name: 'Postman', proficiency: 4, description: 'API endpoint testing and documentation' },
-    ],
-  },
-  {
-    name: 'CS Fundamentals',
-    color: '#8B5CF6',
-    skills: [
-      { name: 'Data Structures & Algorithms', proficiency: 5, highlighted: true, description: 'Graph traversal, priority queues, greedy settlement optimization' },
-      { name: 'OOP & System Design', proficiency: 5, description: 'Object-oriented design patterns, scalable architectures' },
-      { name: 'DBMS', proficiency: 4, description: 'Relational database design, normalization' },
-      { name: 'Operating Systems & Networks', proficiency: 4, description: 'Concurreny, socket programming, network protocols' },
-    ],
-  },
-  {
-    name: 'Frontend (Auxiliary)',
-    color: '#EC4899',
-    skills: [
-      { name: 'React & Next.js', proficiency: 4, description: 'Dynamic component rendering, UI states' },
-      { name: 'Tailwind CSS & Animations', proficiency: 4, description: 'Utility styling, Framer Motion, GSAP scroll controls' },
+      { name: 'SOME/IP & VSOMEIP', proficiency: 5, highlighted: true, description: 'Vehicle ECU telemetry, payload parsing, SDV integration' },
+      { name: 'Protocol Buffers & gRPC', proficiency: 5, highlighted: true, description: 'Typed serialization schema contracts, low-latency bridges' },
+      { name: 'Docker & Linux', proficiency: 5, highlighted: true, description: 'Containerization, reproducible deployment, shell automation' },
+      { name: 'Git & CMake', proficiency: 5, highlighted: true, description: 'Version control, collaborative workflows, C++ build configuration' },
+      { name: 'Jest & Postman', proficiency: 5, highlighted: true, description: 'Automated regression test suites, API endpoint validation' },
+      { name: 'Data Structures & OOP', proficiency: 5, highlighted: true, description: 'Graph algorithms, DBMS, operating systems, system design' },
     ],
   },
 ]
-

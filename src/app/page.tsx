@@ -1,11 +1,10 @@
 import { Hero } from '@/components/sections/Hero'
 import { Skills } from '@/components/sections/Skills'
 import { SelectedWork } from '@/components/sections/SelectedWork'
-import { Pause } from '@/components/sections/Pause'
-import { EngineeringHighlights } from '@/components/sections/EngineeringHighlights'
-import { WhatImBuildingNext } from '@/components/sections/WhatImBuildingNext'
+import { Experience } from '@/components/sections/Experience'
+import { About } from '@/components/sections/About'
 import { Connect } from '@/components/sections/Connect'
-import { InteractiveSVGDivider } from '@/components/ui/InteractiveSVGDivider'
+import { ResumeDialog } from '@/components/ui/ResumeDialog'
 import { prisma } from '@/lib/db'
 import type { ProjectItem } from '@/types'
 
@@ -22,6 +21,7 @@ async function getProjectsFromDb(): Promise<ProjectItem[]> {
     return dbProjects.map((p) => ({
       id: p.id,
       name: p.title,
+      category: (p.techStack.includes('Python') ? 'AI' : p.techStack.includes('C++') ? 'Systems' : 'Backend') as 'Backend' | 'AI' | 'Systems',
       tagline: p.description.slice(0, 80) + '...',
       description: p.description,
       problem: p.problem,
@@ -29,6 +29,7 @@ async function getProjectsFromDb(): Promise<ProjectItem[]> {
       architecture: p.architecture,
       challenges: p.challenges,
       results: p.results,
+      highlights: p.metrics ? [p.metrics] : [],
       metrics: p.metrics ? [p.metrics] : [],
       techStack: p.techStack,
       tags: p.techStack.slice(0, 3),
@@ -38,6 +39,7 @@ async function getProjectsFromDb(): Promise<ProjectItem[]> {
       featured: p.featured,
       status: 'production',
       lessonsLearned: '',
+      accentColor: '#FF5C35',
     }))
   } catch (err) {
     console.error('Error fetching database projects, falling back to static projects:', err)
@@ -50,31 +52,26 @@ export default async function HomePage() {
 
   return (
     <>
+      {/* 01. Hero Section */}
       <Hero />
 
-      <InteractiveSVGDivider />
-
+      {/* 02. Draggable Stack Section */}
       <Skills />
 
-      <InteractiveSVGDivider />
-
+      {/* 03. Work Section */}
       <SelectedWork initialProjects={dbProjects} />
 
-      <InteractiveSVGDivider />
+      {/* 04. Experience Section */}
+      <Experience />
 
-      <Pause />
+      {/* 05. About Section */}
+      <About />
 
-      <InteractiveSVGDivider />
-
-      <EngineeringHighlights />
-
-      <InteractiveSVGDivider />
-
-      <WhatImBuildingNext />
-
-      <InteractiveSVGDivider />
-
+      {/* 06. Contact Section */}
       <Connect />
+
+      {/* Global Resume Modal Dialog */}
+      <ResumeDialog />
     </>
   )
 }

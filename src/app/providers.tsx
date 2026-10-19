@@ -5,6 +5,7 @@ import Lenis from 'lenis'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { UIProvider } from '@/context/UIContext'
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const prefersReduced = useReducedMotion()
@@ -13,13 +14,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
     gsap.registerPlugin(ScrollTrigger)
 
     if (prefersReduced) {
-      // Disable smooth scroll and keep GSAP animations minimal
       gsap.globalTimeline.timeScale(10)
       return
     }
 
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 1.0,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
@@ -35,15 +35,16 @@ export function Providers({ children }: { children: React.ReactNode }) {
     gsap.ticker.lagSmoothing(0)
 
     document.documentElement.classList.add('lenis')
-    document.documentElement.classList.add('custom-cursor-active')
+    ;(window as unknown as { __lenis?: Lenis }).__lenis = lenis
 
     return () => {
+      delete (window as unknown as { __lenis?: Lenis }).__lenis
       lenis.destroy()
       gsap.ticker.remove(ticker)
       ScrollTrigger.killAll()
-      document.documentElement.classList.remove('lenis', 'custom-cursor-active')
+      document.documentElement.classList.remove('lenis')
     }
   }, [prefersReduced])
 
-  return <>{children}</>
+  return <UIProvider>{children}</UIProvider>
 }

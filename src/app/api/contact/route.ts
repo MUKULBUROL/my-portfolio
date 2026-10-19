@@ -21,8 +21,8 @@ const contactSchema = z.object({
 
 function getResendClient() {
   const apiKey = process.env.RESEND_API_KEY
-  if (!apiKey) {
-    throw new Error('RESEND_API_KEY environment variable is not set.')
+  if (!apiKey || apiKey === 're_...' || apiKey.startsWith('re_...')) {
+    throw new Error('Email service is not yet configured with a valid RESEND_API_KEY.')
   }
   return new Resend(apiKey)
 }
@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
     if (error) {
       console.error('Resend error:', error)
       return NextResponse.json(
-        { error: 'Failed to send message. Please try again later.' },
+        { error: 'Email delivery failed. Please send your message directly to mukulburoli@gmail.com.' },
         { status: 500 }
       )
     }
@@ -106,9 +106,9 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error('Contact form error:', err)
     const message =
-      err instanceof Error && err.message.includes('RESEND_API_KEY')
-        ? 'Email service is not configured. Please contact directly via email.'
-        : 'Internal server error.'
+      err instanceof Error && (err.message.includes('RESEND_API_KEY') || err.message.includes('not yet configured'))
+        ? 'Email service is not yet configured. Please contact directly via mukulburoli@gmail.com.'
+        : 'Internal server error. Please contact directly via mukulburoli@gmail.com.'
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }

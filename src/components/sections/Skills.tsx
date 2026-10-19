@@ -1,364 +1,247 @@
 'use client'
 
-import React, { useRef, useEffect, useLayoutEffect, useState } from 'react'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { skillCategories } from '@/data/skills'
-import { SectionHeader } from '../ui/SectionHeader'
-import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { NanoCar } from '../ui/NanoCar'
+import React, { useState, useRef, useMemo } from 'react'
+import { useUI } from '@/context/UIContext'
+import { GripVertical, RotateCcw, Sparkles } from 'lucide-react'
+
+interface DraggableTech {
+  id: string
+  name: string
+  category: string
+  bgColor: string
+  textColor: string
+  borderAccent?: string
+  isCustom?: boolean
+}
+
+const defaultTechnologies: DraggableTech[] = [
+  { id: 'cpp', name: 'C++', category: 'Systems', bgColor: '#FF5C35', textColor: '#FAF7F0' },
+  { id: 'java', name: 'Java', category: 'Backend', bgColor: '#FACC15', textColor: '#121212' },
+  { id: 'python', name: 'Python', category: 'AI & Data', bgColor: '#38BDF8', textColor: '#121212' },
+  { id: 'typescript', name: 'TypeScript', category: 'Open Source', bgColor: '#3178C6', textColor: '#FAF7F0' },
+  { id: 'springboot', name: 'Spring Boot', category: 'Backend', bgColor: '#A3E635', textColor: '#121212' },
+  { id: 'fastapi', name: 'FastAPI', category: 'Async APIs', bgColor: '#FAF7F0', textColor: '#121212' },
+  { id: 'someip', name: 'SOME/IP', category: 'Automotive SDV', bgColor: '#FF5C35', textColor: '#FAF7F0' },
+  { id: 'protobuf', name: 'Protobuf', category: 'Serialization', bgColor: '#FACC15', textColor: '#121212' },
+  { id: 'docker', name: 'Docker', category: 'DevOps', bgColor: '#121212', textColor: '#FAF7F0' },
+  { id: 'jest', name: 'Jest', category: 'Testing', bgColor: '#C21325', textColor: '#FAF7F0' },
+]
 
 export function Skills() {
-  const sectionRef = useRef<HTMLDivElement>(null)
-  const panelRef = useRef<HTMLDivElement>(null)
-  const pillRef = useRef<HTMLSpanElement>(null)
-  const tabsContainerRef = useRef<HTMLDivElement>(null)
-  const prefersReducedMotion = useReducedMotion()
+  const { parsedResume } = useUI()
+  const [positions, setPositions] = useState<Record<string, { x: number; y: number }>>({})
+  const [activeDragId, setActiveDragId] = useState<string | null>(null)
+  const dragStartRef = useRef<{ id: string; startX: number; startY: number; initialX: number; initialY: number } | null>(null)
 
-  const [activeTab, setActiveTab] = useState(0)
-  const [hasEntered, setHasEntered] = useState(false)
-  const [hoveredSkill, setHoveredSkill] = useState<string | null>(null)
+  // Derive tech list including detected resume skills without setting state in an effect
+  const techList = useMemo(() => {
+    if (parsedResume && parsedResume.skills && parsedResume.skills.length > 0) {
+      const palette = ['#FF5C35', '#A3E635', '#38BDF8', '#FACC15', '#FAF7F0']
+      const existingNames = new Set(defaultTechnologies.map((t) => t.name.toLowerCase()))
+      
+      const newCustomTechs: DraggableTech[] = parsedResume.skills
+        .filter((skill) => !existingNames.has(skill.toLowerCase()))
+        .map((skill, index) => ({
+          id: `custom-${skill.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+          name: skill,
+          category: 'Resume Match',
+          bgColor: palette[index % palette.length],
+          textColor: palette[index % palette.length] === '#121212' || palette[index % palette.length] === '#FF5C35' ? '#FAF7F0' : '#121212',
+          isCustom: true,
+        }))
 
-  const tabButtonRefs = useRef<(HTMLButtonElement | null)[]>([])
-  // Map from skill name → bar element; populated via callback refs
-  const barRefs = useRef<Map<string, HTMLDivElement>>(new Map())
+      return [...defaultTechnologies, ...newCustomTechs]
+    }
+    return defaultTechnologies
+  }, [parsedResume])
 
-  const category = skillCategories[activeTab]
+  const handlePointerDown = (id: string, e: React.PointerEvent<HTMLDivElement>) => {
+    // Only accept primary pointer button
+    if (e.button !== 0 && e.pointerType === 'mouse') return
 
-  // ── helpers ────────────────────────────────────────────────
+    const currentPos = positions[id] || { x: 0, y: 0 }
+    dragStartRef.current = {
+      id,
+      startX: e.clientX,
+      startY: e.clientY,
+      initialX: currentPos.x,
+      initialY: currentPos.y,
+    }
 
-  const movePill = (index: number, animate = true) => {
-    const btn = tabButtonRefs.current[index]
-    const pill = pillRef.current
-    if (!btn || !pill) return
-    gsap.to(pill, {
-      x: btn.offsetLeft,
-      width: btn.offsetWidth,
-      duration: animate && !prefersReducedMotion ? 0.38 : 0,
-      ease: 'power3.out',
-    })
-  }
-
-  const animateBars = () => {
-    if (prefersReducedMotion) return
-    category.skills.forEach((skill, i) => {
-      const bar = barRefs.current.get(skill.name)
-      if (!bar) return
-      gsap.fromTo(
-        bar,
-        { scaleX: 0 },
-        {
-          scaleX: skill.proficiency / 5,
-          duration: 0.75,
-          ease: 'power3.out',
-          delay: i * 0.055,
+    // For mouse, immediately capture and start dragging
+    if (e.pointerType !== 'touch') {
+      e.preventDefault()
+      const target = e.currentTarget
+      try {
+        if (typeof target.setPointerCapture === 'function') {
+          target.setPointerCapture(e.pointerId)
         }
-      )
-    })
-  }
-
-  const animateRowsIn = (fromX: number) => {
-    const rows = panelRef.current?.querySelectorAll('.skill-row')
-    if (!rows || prefersReducedMotion) return
-    gsap.fromTo(
-      rows,
-      { opacity: 0, x: fromX },
-      { opacity: 1, x: 0, duration: 0.4, stagger: 0.06, ease: 'power3.out', clearProps: 'all' }
-    )
-  }
-
-  // ── scroll trigger (once) ─────────────────────────────────
-
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger)
-
-    const trigger = ScrollTrigger.create({
-      trigger: sectionRef.current,
-      start: 'top 72%',
-      once: true,
-      onEnter: () => setHasEntered(true),
-    })
-
-    return () => trigger.kill()
-  }, [])
-
-  // ── first entrance after scroll ───────────────────────────
-
-  useEffect(() => {
-    if (!hasEntered) return
-    animateRowsIn(24)
-    animateBars()
-    movePill(activeTab)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasEntered])
-
-  // ── tab switch ────────────────────────────────────────────
-
-  const handleTabSwitch = (index: number) => {
-    if (index === activeTab) return
-    movePill(index)
-
-    if (!prefersReducedMotion && panelRef.current) {
-      const rows = panelRef.current.querySelectorAll('.skill-row')
-      gsap.to(rows, {
-        opacity: 0,
-        x: -16,
-        duration: 0.14,
-        ease: 'power2.in',
-        onComplete: () => setActiveTab(index),
-      })
-    } else {
-      setActiveTab(index)
+      } catch {}
+      setActiveDragId(id)
     }
   }
 
-  // ── car callbacks ─────────────────────────────────────────
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const currentDrag = dragStartRef.current
+    if (!currentDrag) return
 
-  /**
-   * Fires the moment the car starts moving — move the pill
-   * indicator ahead of time so it tracks intent.
-   */
-  const handleCarDriveStart = (next: number) => {
-    movePill(next)
-  }
+    const deltaX = e.clientX - currentDrag.startX
+    const deltaY = e.clientY - currentDrag.startY
 
-  /**
-   * Fires after the car arrives at the destination stop —
-   * only NOW do we animate the content in/out.
-   */
-  const handleCarArrival = (next: number) => {
-    if (next === activeTab) return
-    if (!prefersReducedMotion && panelRef.current) {
-      const rows = panelRef.current.querySelectorAll('.skill-row')
-      gsap.to(rows, {
-        opacity: 0,
-        x: -16,
-        duration: 0.14,
-        ease: 'power2.in',
-        onComplete: () => setActiveTab(next),
-      })
-    } else {
-      setActiveTab(next)
+    // If on touch device, verify horizontal intent before locking scroll
+    if (e.pointerType === 'touch' && activeDragId !== currentDrag.id) {
+      if (Math.abs(deltaX) > 10 && Math.abs(deltaX) > Math.abs(deltaY)) {
+        try {
+          if (typeof e.currentTarget.setPointerCapture === 'function') {
+            e.currentTarget.setPointerCapture(e.pointerId)
+          }
+        } catch {}
+        setActiveDragId(currentDrag.id)
+      } else if (Math.abs(deltaY) > 8) {
+        // Vertical swipe intent: do not trap scroll
+        dragStartRef.current = null
+        return
+      } else {
+        return
+      }
     }
+
+    if (currentDrag.id !== activeDragId) return
+
+    const targetId = currentDrag.id
+    const nextX = Math.round(currentDrag.initialX + deltaX)
+    const nextY = Math.round(currentDrag.initialY + deltaY)
+
+    setPositions((prev) => ({
+      ...prev,
+      [targetId]: {
+        x: nextX,
+        y: nextY,
+      },
+    }))
   }
 
-  // Animate in after tab state actually changes
-  useEffect(() => {
-    if (!hasEntered) return
-    animateRowsIn(20)
-    animateBars()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab])
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    try {
+      if (e.currentTarget && typeof e.currentTarget.hasPointerCapture === 'function') {
+        if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+          e.currentTarget.releasePointerCapture(e.pointerId)
+        }
+      }
+    } catch {}
+    setActiveDragId(null)
+    dragStartRef.current = null
+  }
 
-  // ── position pill on mount before paint ───────────────────
+  const handleDoubleClick = (id: string) => {
+    setPositions((prev) => {
+      const updated = { ...prev }
+      delete updated[id]
+      return updated
+    })
+  }
 
-  useLayoutEffect(() => {
-    movePill(0, false)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // ─────────────────────────────────────────────────────────
+  const handleResetAll = () => {
+    setPositions({})
+    setActiveDragId(null)
+    dragStartRef.current = null
+  }
 
   return (
     <section
       id="skills"
-      ref={sectionRef}
-      className="py-24 md:py-32 bg-[#f5efe8] relative overflow-hidden"
-      aria-label="Technical skills"
+      aria-label="Draggable Technical Stack"
+      className="relative py-20 bg-[#FAF7F0] dark:bg-[#121212] border-t-3 border-[#121212] dark:border-[#FAF7F0] overflow-hidden"
     >
-      {/* Subtle dot grid */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none opacity-[0.035]"
-        style={{
-          backgroundImage: 'radial-gradient(#111111 1px, transparent 1px)',
-          backgroundSize: '28px 28px',
-        }}
-      />
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        
+        {/* Section Header */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b-2.5 border-[#121212] dark:border-[#FAF7F0] pb-6 mb-12 gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-[#FF5C35] mb-2">
+              <span>STACK // INTERACTION</span>
+            </div>
+            <h2 className="font-heading font-black text-3xl sm:text-5xl uppercase tracking-tight text-[#121212] dark:text-[#FAF7F0]">
+              Move the stack around.
+            </h2>
+            <p className="font-mono text-xs sm:text-sm text-[#555555] dark:text-[#A3A3A3] mt-2">
+              Drag the objects. Double-click one to snap it back.
+            </p>
+          </div>
 
-      <div className="max-w-5xl mx-auto px-6 md:px-12 relative z-10">
-        <SectionHeader
-          eyebrow="Skills"
-          eyebrowNumber="01"
-          title="Technical Arsenal"
-          subtitle="Core competencies across systems programming, distributed architectures, and scalable backend engineering."
-        />
-
-        {/* ── Tab strip with sliding pill — full width so tab centres
-             align with the car-track stop positions ── */}
-        <div
-          ref={tabsContainerRef}
-          role="tablist"
-          aria-label="Skill categories"
-          className="relative flex w-full p-1 mb-4 rounded-xl bg-[#11111108]"
-        >
-          {/* The sliding active grey pill */}
-          <span
-            ref={pillRef}
-            aria-hidden="true"
-            className="absolute top-1 left-1 h-[calc(100%-8px)] rounded-lg bg-neutral-200/80 dark:bg-neutral-800/80 shadow-sm pointer-events-none"
-          />
-
-          {skillCategories.map((cat, i) => (
-            <button
-              key={cat.name}
-              ref={(el) => { tabButtonRefs.current[i] = el }}
-              role="tab"
-              aria-selected={i === activeTab}
-              aria-controls="skills-panel"
-              id={`skills-tab-${i}`}
-              onClick={() => handleTabSwitch(i)}
-              className="relative z-10 flex-1 py-2 px-1 text-xs font-mono font-bold uppercase tracking-widest rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-offset-1 text-center whitespace-nowrap transition-colors duration-200"
-              style={{ color: i === activeTab ? cat.color : '#6b6b6b' }}
-            >
-              {cat.name}
-            </button>
-          ))}
+          <button
+            onClick={handleResetAll}
+            className="self-start sm:self-auto brutal-btn flex items-center gap-2 bg-[#FAF7F0] dark:bg-[#1C1C1C] text-[#121212] dark:text-[#FAF7F0] px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider cursor-pointer"
+          >
+            <RotateCcw size={13} />
+            <span>Reset stack</span>
+          </button>
         </div>
 
-        {/* ── Nano Car track ── */}
-        <NanoCar
-          activeTab={activeTab}
-          tabCount={skillCategories.length}
-          tabColors={skillCategories.map((c) => c.color)}
-          onDriveStart={handleCarDriveStart}
-          onArrival={handleCarArrival}
-        />
-
-        {/* ── Skill rows ── */}
-        <div
-          id="skills-panel"
-          ref={panelRef}
-          role="tabpanel"
-          aria-labelledby={`skills-tab-${activeTab}`}
-          className="flex flex-col"
-        >
-          {category.skills.map((skill, i) => {
-            const isHovered = hoveredSkill === skill.name
-            const pct = Math.round((skill.proficiency / 5) * 100)
+        {/* Draggable Sandbox Arena */}
+        <div className="relative min-h-[360px] sm:min-h-[320px] border-2.5 border-dashed border-[#121212]/40 dark:border-[#FAF7F0]/40 bg-[#FAF7F0]/50 dark:bg-[#181818]/50 p-6 flex flex-wrap gap-4 sm:gap-6 items-center justify-center touch-pan-y">
+          
+          {techList.map((item) => {
+            const pos = positions[item.id] || { x: 0, y: 0 }
+            const isDragging = activeDragId === item.id
 
             return (
               <div
-                key={skill.name}
-                className="skill-row relative"
-                onMouseEnter={() => setHoveredSkill(skill.name)}
-                onMouseLeave={() => setHoveredSkill(null)}
+                key={item.id}
+                onPointerDown={(e) => handlePointerDown(item.id, e)}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={handlePointerUp}
+                onLostPointerCapture={handlePointerUp}
+                onDoubleClick={() => handleDoubleClick(item.id)}
+                className={`relative cursor-grab active:cursor-grabbing border-2.5 border-[#121212] dark:border-[#FAF7F0] p-4 sm:p-5 flex items-center gap-3 select-none ${
+                  isDragging
+                    ? 'z-50 shadow-[10px_10px_0px_0px_#121212] dark:shadow-[10px_10px_0px_0px_#000000] scale-105 touch-none'
+                    : 'z-10 shadow-[4px_4px_0px_0px_#121212] dark:shadow-[4px_4px_0px_0px_#000000] hover:shadow-[6px_6px_0px_0px_#121212] touch-pan-y'
+                }`}
+                style={{
+                  backgroundColor: item.bgColor,
+                  color: item.textColor,
+                  transform: `translate(${pos.x}px, ${pos.y}px)`,
+                  transition: isDragging
+                    ? 'none'
+                    : 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease',
+                  willChange: isDragging ? 'transform' : 'auto',
+                }}
               >
-                {/* Hover background fill */}
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-0 rounded-xl transition-opacity duration-200 pointer-events-none"
-                  style={{
-                    backgroundColor: `${category.color}07`,
-                    opacity: isHovered ? 1 : 0,
-                  }}
-                />
+                {/* Drag Grip Handle */}
+                <GripVertical className="w-4 h-4 opacity-70 flex-shrink-0" />
 
-                {/* Thin top border (separator) except first row */}
-                {i > 0 && (
-                  <div
-                    aria-hidden="true"
-                    className="absolute top-0 left-6 right-6 h-px"
-                    style={{ backgroundColor: '#11111109' }}
-                  />
-                )}
-
-                <div className="relative px-3 py-4">
-                  {/* Main row: index · name + badge · bar · pct */}
-                  <div className="flex items-center gap-4">
-
-                    {/* Row index */}
-                    <span
-                      aria-hidden="true"
-                      className="text-[10px] font-mono tabular-nums w-5 shrink-0 select-none text-[#111111]/20"
-                    >
-                      {String(i + 1).padStart(2, '0')}
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-heading font-black text-lg sm:text-xl uppercase tracking-tight leading-none">
+                      {item.name}
                     </span>
-
-                    {/* Skill name + Core badge */}
-                    <div className="flex items-center gap-2 w-44 shrink-0">
-                      <span className="text-sm font-mono font-bold text-[#111111] leading-none">
-                        {skill.name}
+                    {item.isCustom && (
+                      <span className="font-mono text-[9px] font-bold uppercase bg-[#FF5C35] text-[#FAF7F0] px-1 py-0.5 ml-1 border border-[#121212]">
+                        DETECTED
                       </span>
-                      {skill.highlighted && (
-                        <span
-                          className="text-[8px] font-mono uppercase px-1.5 py-0.5 rounded-sm font-black tracking-wide shrink-0 leading-none"
-                          style={{
-                            color: category.color,
-                            backgroundColor: `${category.color}14`,
-                          }}
-                        >
-                          Core
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Animated fill bar */}
-                    <div
-                      aria-label={`Proficiency: ${pct}%`}
-                      className="flex-1 h-[3px] rounded-full overflow-hidden"
-                      style={{ backgroundColor: `${category.color}18` }}
-                    >
-                      <div
-                        ref={(el) => {
-                          if (el) barRefs.current.set(skill.name, el)
-                          else barRefs.current.delete(skill.name)
-                        }}
-                        className="h-full rounded-full origin-left"
-                        style={{
-                          backgroundColor: category.color,
-                          transformOrigin: 'left center',
-                          transform: 'scaleX(0)',
-                        }}
-                      />
-                    </div>
-
-                    {/* Proficiency reading */}
-                    <span
-                      className="text-[11px] font-mono tabular-nums w-8 text-right shrink-0 transition-all duration-200"
-                      style={{
-                        color: category.color,
-                        opacity: isHovered ? 1 : 0.3,
-                        fontWeight: isHovered ? 700 : 400,
-                      }}
-                    >
-                      {pct}%
-                    </span>
+                    )}
                   </div>
-
-                  {/* Description — smooth height expand on hover */}
-                  {skill.description && (
-                    <div
-                      className="overflow-hidden transition-all duration-300 ease-out"
-                      style={{
-                        maxHeight: isHovered ? '52px' : '0px',
-                        opacity: isHovered ? 1 : 0,
-                      }}
-                    >
-                      <p className="pt-2 pl-[168px] text-[11px] font-sans text-[#6b6b6b] leading-relaxed">
-                        {skill.description}
-                      </p>
-                    </div>
-                  )}
+                  <span className="font-mono text-[10px] uppercase font-bold tracking-wider opacity-80 mt-0.5">
+                    {item.category}
+                  </span>
                 </div>
               </div>
             )
           })}
+
         </div>
 
-        {/* ── Footer ── */}
-        <div className="mt-8 flex items-center gap-4">
-          <div
-            aria-hidden="true"
-            className="h-px flex-1"
-            style={{
-              background: `linear-gradient(to right, ${category.color}50, transparent)`,
-            }}
-          />
-          <span className="text-[10px] font-mono text-[#111111]/30 uppercase tracking-widest">
-            {category.skills.length} skill{category.skills.length !== 1 ? 's' : ''} &mdash; hover to expand
-          </span>
+        {/* Micro instructions strip */}
+        <div className="flex items-center justify-between border-t-2 border-[#121212]/20 dark:border-[#FAF7F0]/20 pt-4 mt-6 font-mono text-[11px] text-[#555555] dark:text-[#A3A3A3]">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-3.5 h-3.5 text-[#FACC15]" />
+            <span>Touch-safe vertical scrolling · Pointer interactive</span>
+          </div>
+          <span className="hidden sm:inline font-bold uppercase">Double-click any object to reset position</span>
         </div>
+
       </div>
     </section>
   )

@@ -1,403 +1,502 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { MagneticButton } from '../ui/MagneticButton'
-import { ArrowRight, ChevronDown, Download, Mail, GraduationCap, MapPin } from 'lucide-react'
+import React, { useEffect, useRef, useCallback } from 'react'
+import Image from 'next/image'
+import { animate } from 'framer-motion'
+import { useUI } from '@/context/UIContext'
 import { resume } from '@/data/resume'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { TechMarquee } from '../ui/TechMarquee'
-import { HeroAvatar } from '../ui/HeroAvatar'
-
-gsap.registerPlugin(ScrollTrigger)
+import { ArrowUpRight, FileText, Eye } from 'lucide-react'
+import { gsap } from 'gsap'
 
 export function Hero() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const nameRef = useRef<HTMLHeadingElement>(null)
-  const underlineRef = useRef<HTMLDivElement>(null)
-  const roleRef = useRef<HTMLDivElement>(null)
-  const descRef = useRef<HTMLDivElement>(null)
-  const techRef = useRef<HTMLDivElement>(null)
-  const ctaRef = useRef<HTMLDivElement>(null)
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const photoRef = useRef<HTMLDivElement>(null)
-  const metadataRef = useRef<HTMLDivElement>(null)
-  const glowRef = useRef<HTMLDivElement>(null)
-  const prefersReducedMotion = useReducedMotion()
-  const [copied, setCopied] = useState(false)
+  const { navigateWithTransition, isCurtainActive, openResumeDialog } = useUI()
+  const prefersReduced = useReducedMotion()
 
-  const handleCopyEmail = async () => {
-    try {
-      await navigator.clipboard.writeText('mukulburoli@gmail.com')
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch (err) {
-      console.error('Failed to copy email: ', err)
-    }
-  }
+  const heroRef = useRef<HTMLElement>(null)
+  const leftColRef = useRef<HTMLDivElement>(null)
+  const rightColRef = useRef<HTMLDivElement>(null)
+  const heroVisualRef = useRef<HTMLDivElement>(null)
+  const draggableRef = useRef<HTMLDivElement>(null)
+  const hintRef = useRef<HTMLDivElement>(null)
 
+  // Drag state (held in refs outside React state for 60fps performance)
+  const isDraggingRef = useRef(false)
+  const hasMovedRef = useRef(false)
+  const hasDraggedOnceRef = useRef(false)
+
+  const startPointerRef = useRef({ x: 0, y: 0 })
+  const pointerIdRef = useRef<number | null>(null)
+  const currentXRef = useRef(0)
+  const currentYRef = useRef(0)
+  const currentRotateRef = useRef(0)
+  const currentScaleRef = useRef(1)
+
+  // Spring animation controls
+  const animXRef = useRef<{ stop: () => void } | null>(null)
+  const animYRef = useRef<{ stop: () => void } | null>(null)
+  const animScaleRef = useRef<{ stop: () => void } | null>(null)
+
+  const stopSprings = useCallback(() => {
+    animXRef.current?.stop()
+    animYRef.current?.stop()
+    animScaleRef.current?.stop()
+    animXRef.current = null
+    animYRef.current = null
+    animScaleRef.current = null
+  }, [])
+
+  // Safe movement limit dynamically calculated to prevent overlapping navbar or buttons
+  const getSafeLimit = useCallback(() => {
+    if (typeof window === 'undefined') return 100
+    const w = window.innerWidth
+    if (w < 640) return 38
+    if (w < 768) return 48
+    if (w < 1024) return 68
+    if (w < 1280) return 88
+    return 105
+  }, [])
+
+  const updateTransform = useCallback(() => {
+    if (!draggableRef.current) return
+    // Subtle pendulum arc lifting: bob rises slightly when swinging outward
+    const arcLift = (currentXRef.current * currentXRef.current) / 600
+    const finalY = currentYRef.current - arcLift
+    draggableRef.current.style.transform = `translate3d(${currentXRef.current.toFixed(2)}px, ${finalY.toFixed(2)}px, 0px) rotate(${currentRotateRef.current.toFixed(2)}deg) scale(${currentScaleRef.current.toFixed(3)})`
+  }, [])
+
+  // Desktop pointer subtle parallax
   useEffect(() => {
-    if (prefersReducedMotion) {
-      const els = [
-        photoRef.current,
-        roleRef.current,
-        nameRef.current,
-        underlineRef.current,
-        descRef.current,
-        metadataRef.current,
-        techRef.current,
-        ctaRef.current,
-        scrollRef.current,
-      ]
-      els.forEach((el) => { if (el) gsap.set(el, { opacity: 1, y: 0 }) })
-      gsap.set('.title-word', { y: '0%' })
+    if (prefersReduced) return
+
+    if (typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches) {
       return
     }
 
-    const ctx = gsap.context(() => {
-      // Set initial states
-      gsap.set(roleRef.current, { y: 15, opacity: 0 })
-      gsap.set('.title-word', { y: '100%' })
-      if (underlineRef.current) gsap.set(underlineRef.current, { scaleX: 0, opacity: 0 })
-      gsap.set(descRef.current, { y: 15, opacity: 0 })
-      gsap.set(metadataRef.current, { y: 15, opacity: 0 })
-      gsap.set(techRef.current, { y: 15, opacity: 0 })
-      gsap.set(ctaRef.current, { y: 15, opacity: 0 })
-      gsap.set(scrollRef.current, { opacity: 0 })
+    const hero = heroRef.current
+    const visual = heroVisualRef.current
+    if (!hero || !visual) return
 
-      // Sequenced reveal timeline
-      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
-
-      tl.fromTo(photoRef.current, { opacity: 0, scale: 0.88 }, { opacity: 1, scale: 1, duration: 0.8 })
-        .to(roleRef.current, { y: 0, opacity: 1, duration: 0.4 }, '-=0.3')
-        .to('.title-word', { y: '0%', duration: 0.8, stagger: 0.08, ease: 'power4.out' }, '-=0.2')
-        .to(underlineRef.current, { scaleX: 1, opacity: 1, transformOrigin: 'left center', duration: 0.8, ease: 'power2.inOut' }, '-=0.2')
-        .to(descRef.current, { y: 0, opacity: 1, duration: 0.4 }, '-=0.3')
-        .to(ctaRef.current, { y: 0, opacity: 1, duration: 0.4 }, '-=0.2')
-        .to(metadataRef.current, { y: 0, opacity: 1, duration: 0.4 }, '-=0.3')
-        .to(techRef.current, { y: 0, opacity: 1, duration: 0.4 }, '-=0.2')
-        .to(scrollRef.current, { opacity: 1, duration: 0.3 }, '-=0.1')
-
-      // Gentle floating animation on photo — continuous
-      if (photoRef.current) {
-        gsap.to(photoRef.current, {
-          y: -12,
-          duration: 3.2,
-          ease: 'sine.inOut',
-          yoyo: true,
-          repeat: -1,
-          delay: 0.9,
-        })
-      }
-    })
-
-    return () => ctx.revert()
-  }, [prefersReducedMotion])
-
-  useEffect(() => {
-    const container = containerRef.current
-    const glow = glowRef.current
-    if (!container || !glow || prefersReducedMotion) return
+    const xVisualTo = gsap.quickTo(visual, 'x', { duration: 0.5, ease: 'power2.out' })
+    const yVisualTo = gsap.quickTo(visual, 'y', { duration: 0.5, ease: 'power2.out' })
 
     const handleMouseMove = (e: MouseEvent) => {
-      const rect = container.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const y = e.clientY - rect.top
+      if (isDraggingRef.current) return
 
-      gsap.to(glow, {
-        x,
-        y,
-        opacity: 1,
-        duration: 0.8,
-        ease: 'power2.out',
-      })
+      const rect = hero.getBoundingClientRect()
+      const relX = (e.clientX - rect.left) / rect.width - 0.5
+      const relY = (e.clientY - rect.top) / rect.height - 0.5
+
+      // Subtle parallax: max 6px
+      xVisualTo(relX * 7)
+      yVisualTo(relY * 5)
     }
 
     const handleMouseLeave = () => {
-      gsap.to(glow, {
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power2.out',
-      })
+      xVisualTo(0)
+      yVisualTo(0)
     }
 
-    container.addEventListener('mousemove', handleMouseMove)
-    container.addEventListener('mouseleave', handleMouseLeave)
+    hero.addEventListener('mousemove', handleMouseMove)
+    hero.addEventListener('mouseleave', handleMouseLeave)
 
     return () => {
-      container.removeEventListener('mousemove', handleMouseMove)
-      container.removeEventListener('mouseleave', handleMouseLeave)
+      hero.removeEventListener('mousemove', handleMouseMove)
+      hero.removeEventListener('mouseleave', handleMouseLeave)
     }
-  }, [prefersReducedMotion])
+  }, [prefersReduced])
 
-  useEffect(() => {
-    if (prefersReducedMotion) return
+  // Spring release back to origin
+  const release = useCallback(() => {
+    if (!isDraggingRef.current) return
+    isDraggingRef.current = false
 
-    const words = document.querySelectorAll('.title-word')
-
-    const onEnter = (e: Event) => {
-      const el = e.currentTarget as HTMLElement
-      gsap.to(el, {
-        y: -6,
-        scale: 1.03,
-        duration: 0.3,
-        ease: 'power2.out',
-      })
-    }
-
-    const onLeave = (e: Event) => {
-      const el = e.currentTarget as HTMLElement
-      gsap.to(el, {
-        y: 0,
-        scale: 1,
-        duration: 0.4,
-        ease: 'power3.out',
-      })
+    if (draggableRef.current) {
+      draggableRef.current.style.cursor = 'grab'
+      if (pointerIdRef.current !== null) {
+        try {
+          draggableRef.current.releasePointerCapture(pointerIdRef.current)
+        } catch {}
+        pointerIdRef.current = null
+      }
     }
 
-    words.forEach((word) => {
-      word.addEventListener('mouseenter', onEnter)
-      word.addEventListener('mouseleave', onLeave)
-    })
-
-    return () => {
-      words.forEach((word) => {
-        word.removeEventListener('mouseenter', onEnter)
-        word.removeEventListener('mouseleave', onLeave)
-      })
+    // Fade out hint after first successful drag
+    if (hasMovedRef.current && !hasDraggedOnceRef.current) {
+      hasDraggedOnceRef.current = true
+      if (hintRef.current) {
+        hintRef.current.style.opacity = '0'
+        hintRef.current.style.pointerEvents = 'none'
+      }
+      try {
+        sessionStorage.setItem('mk_hero_dragged', 'true')
+      } catch {}
     }
-  }, [prefersReducedMotion])
 
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container || prefersReducedMotion) return
+    stopSprings()
 
-    // Parallax on scroll — elements move at different speeds
-    const nameParallax = gsap.to(nameRef.current, {
-      y: -80,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: container,
-        start: 'top top',
-        end: 'bottom top',
-        scrub: 1.5,
+    if (prefersReduced) {
+      currentXRef.current = 0
+      currentYRef.current = 0
+      currentRotateRef.current = 0
+      currentScaleRef.current = 1
+      updateTransform()
+      return
+    }
+
+    const limit = getSafeLimit()
+
+    // Underdamped pendulum sway: swings smoothly across equilibrium ~3-4 times
+    const pendulumXConfig = {
+      type: 'spring' as const,
+      stiffness: 120,
+      damping: 7.2,
+      mass: 0.95,
+    }
+
+    // Vertical recovery: smoothly returns to baseline
+    const springYConfig = {
+      type: 'spring' as const,
+      stiffness: 155,
+      damping: 11.5,
+      mass: 0.9,
+    }
+
+    animXRef.current = animate(currentXRef.current, 0, {
+      ...pendulumXConfig,
+      onUpdate: (latest) => {
+        currentXRef.current = latest
+        currentRotateRef.current = (latest / limit) * 12
+        updateTransform()
+      },
+      onComplete: () => {
+        currentRotateRef.current = 0
+        updateTransform()
+        animXRef.current = null
       },
     })
 
-    const photoParallax = gsap.to(photoRef.current, {
-      y: -50,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: container,
-        start: 'top top',
-        end: 'bottom top',
-        scrub: 2,
+    animYRef.current = animate(currentYRef.current, 0, {
+      ...springYConfig,
+      onUpdate: (latest) => {
+        currentYRef.current = latest
+        updateTransform()
+      },
+      onComplete: () => {
+        animYRef.current = null
       },
     })
 
-    const textParallax = gsap.to([roleRef.current, descRef.current, techRef.current, ctaRef.current, metadataRef.current], {
-      y: -30,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: container,
-        start: 'top top',
-        end: 'bottom top',
-        scrub: 1,
+    animScaleRef.current = animate(currentScaleRef.current, 1.0, {
+      type: 'spring' as const,
+      stiffness: 240,
+      damping: 18,
+      onUpdate: (latest) => {
+        currentScaleRef.current = latest
+        updateTransform()
+      },
+      onComplete: () => {
+        animScaleRef.current = null
       },
     })
+  }, [prefersReduced, stopSprings, updateTransform, getSafeLimit])
 
-    return () => {
-      nameParallax.scrollTrigger?.kill()
-      photoParallax.scrollTrigger?.kill()
-      textParallax.scrollTrigger?.kill()
-      nameParallax.kill()
-      photoParallax.kill()
-      textParallax.kill()
+  // Drag Pointer Event Handlers
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (prefersReduced || e.button !== 0) return
+
+    // Do not activate while curtain intro is active or main-content is inert
+    if (isCurtainActive) return
+    const main = typeof document !== 'undefined' ? document.getElementById('main-content') : null
+    if (main?.hasAttribute('inert')) return
+
+    stopSprings()
+
+    const target = e.currentTarget
+    target.setPointerCapture(e.pointerId)
+    pointerIdRef.current = e.pointerId
+    isDraggingRef.current = true
+    hasMovedRef.current = false
+    target.style.cursor = 'grabbing'
+
+    const limit = getSafeLimit()
+    const r0 = Math.hypot(currentXRef.current, currentYRef.current)
+
+    if (r0 > 0.001) {
+      const clampedR = Math.min(r0, limit - 0.5)
+      const d0 = (limit * clampedR) / (limit - clampedR)
+      const ux = currentXRef.current / r0
+      const uy = currentYRef.current / r0
+      startPointerRef.current = {
+        x: e.clientX - ux * d0,
+        y: e.clientY - uy * d0,
+      }
+    } else {
+      startPointerRef.current = { x: e.clientX, y: e.clientY }
     }
-  }, [prefersReducedMotion])
 
-  const scrollToSection = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+    currentScaleRef.current = 1.025
+    updateTransform()
   }
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingRef.current) return
+
+    const dx = e.clientX - startPointerRef.current.x
+    const dy = e.clientY - startPointerRef.current.y
+    const distance = Math.hypot(dx, dy)
+
+    if (distance > 5) {
+      hasMovedRef.current = true
+    }
+
+    const limit = getSafeLimit()
+
+    let x = 0
+    let y = 0
+    if (distance > 0) {
+      // Prescribed radial rubber-band mapping: displayedDistance = limit * distance / (limit + distance)
+      const displayedDistance = (limit * distance) / (limit + distance)
+      x = (dx / distance) * displayedDistance
+      y = (dy / distance) * displayedDistance
+    }
+
+    // Pendulum tilt based on displacement angle (up to ±12 degrees)
+    const rotation = Math.max(-12, Math.min(12, (x / limit) * 12))
+
+    currentXRef.current = x
+    currentYRef.current = y
+    currentRotateRef.current = rotation
+    currentScaleRef.current = 1.025
+
+    updateTransform()
+  }
+
+  // Safety listeners: pointercancel, blur, resize
+  useEffect(() => {
+    const onBlur = () => {
+      release()
+    }
+    const onResize = () => {
+      release()
+    }
+    window.addEventListener('blur', onBlur)
+    window.addEventListener('resize', onResize)
+    return () => {
+      window.removeEventListener('blur', onBlur)
+      window.removeEventListener('resize', onResize)
+      stopSprings()
+    }
+  }, [release, stopSprings])
+
+  // Check if user already dragged once in this session
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem('mk_hero_dragged') === 'true' && hintRef.current) {
+        hasDraggedOnceRef.current = true
+        hintRef.current.style.opacity = '0'
+        hintRef.current.style.pointerEvents = 'none'
+      }
+    } catch {}
+  }, [])
 
   return (
     <section
+      ref={heroRef}
       id="hero"
-      ref={containerRef}
-      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden pt-20 bg-transparent"
-      aria-label="Hero section"
+      aria-label="Introduction & Overview"
+      className="relative w-full pt-20 sm:pt-24 lg:pt-28 pb-12 sm:pb-16 lg:pb-20"
     >
-      {/* Subtle vignette overlay */}
-      <div
-        className="absolute inset-0 bg-gradient-to-b from-[#f5efe8]/10 via-transparent to-[#f5efe8]/30 pointer-events-none z-0"
-        aria-hidden="true"
-      />
+      {/*
+        Container: Centered, max-w-6xl mx-auto px-4 sm:px-8
+        Aligns directly with the navbar container boundary
+      */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_auto_1.1fr] xl:grid-cols-[1.15fr_auto_1.15fr] items-center gap-8 lg:gap-8 xl:gap-12 w-full">
 
-      {/* Animated gradient mesh background */}
-      <div className="hero-bg-mesh" aria-hidden="true">
-        <div className="hero-mesh-accent" />
-      </div>
-
-      {/* Interactive Cursor Follow Glow */}
-      <div
-        ref={glowRef}
-        className="absolute pointer-events-none blur-[120px] rounded-full w-[380px] h-[380px] bg-gradient-to-tr from-[#966d3a]/12 to-[#7C3AED]/12 dark:from-[#d4b483]/8 dark:to-[#7C3AED]/8 opacity-0 transition-opacity duration-700 ease-out z-0"
-        style={{ transform: 'translate(-50%, -50%)', left: 0, top: 0 }}
-        aria-hidden="true"
-      />
-
-      {/* Main asymmetric layout */}
-      <div className="relative z-10 max-w-6xl mx-auto px-8 sm:px-12 md:px-16 w-full py-16 flex flex-col md:flex-row items-center justify-between gap-12 min-h-[85vh]">
-
-        {/* ── Left column: text ── */}
-        <div className="flex flex-col items-start text-left select-none flex-1 order-2 md:order-1">
-
-          {/* Role Banner: SOFTWARE ENGINEER + ───────────── ◦ */}
+          {/* ======================================================== */}
+          {/* COLUMN 1: LEFT                                            */}
+          {/* Status -> Name -> Intro -> Education/Internship -> Location*/}
+          {/* ======================================================== */}
           <div
-            ref={roleRef}
-            className="flex items-center gap-3 text-[#966d3a] dark:text-[#d4b483] font-sans text-xs uppercase tracking-[0.25em] mb-6 select-none w-full opacity-0"
+            ref={leftColRef}
+            className="flex flex-col items-start justify-center min-w-0"
           >
-            <span className="font-semibold">Software Engineer</span>
-            <span className="opacity-45">+</span>
-            <div className="flex-1 max-w-[120px] sm:max-w-[180px] h-[1px] bg-[#966d3a]/25 dark:bg-[#d4b483]/25" />
-            <span className="text-[8px] sm:text-[10px]">◦</span>
-          </div>
+            {/* 1.1 Status Badge */}
+            <div className="inline-flex items-center gap-1.5 border border-[#121212] dark:border-[#FAF7F0] bg-[#FAF7F0] dark:bg-[#1C1C1C] px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-wider text-[#121212] dark:text-[#FAF7F0] shadow-[2px_2px_0px_0px_#121212] dark:shadow-[2px_2px_0px_0px_#000000] mb-3 sm:mb-4">
+              <span className="w-1.5 h-1.5 bg-[#FF5C35] rounded-none shrink-0" aria-hidden="true" />
+              <span>Open to opportunities</span>
+            </div>
 
-          {/* Title: Building software that survives production. */}
-          <h1
-            ref={nameRef}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-sans font-bold tracking-tight leading-[1.1] text-[#111111] dark:text-[#e5ded4] select-none mb-6"
-          >
-            <span className="block overflow-hidden py-1">
-              <span className="inline-block title-word">Building</span>{' '}
-              <span className="inline-block title-word">software</span>
-            </span>
-            <span className="block overflow-hidden py-1">
-              <span className="inline-block title-word font-normal">that</span>{' '}
-              <span className="inline-block title-word font-serif italic font-normal text-[#966d3a] dark:text-[#d4b483]">survives</span>
-            </span>
-            <span className="block overflow-hidden py-1">
-              <span className="inline-block title-word">production.</span>
-            </span>
-          </h1>
+            {/* 1.2 Mukul Kumar Heading (H1) */}
+            <h1 className="font-heading font-black text-[clamp(2.4rem,3.8vw,3.5rem)] tracking-tight uppercase leading-[0.92] text-[#121212] dark:text-[#FAF7F0]">
+              <span className="block">MUKUL</span>
+              <span className="block">KUMAR</span>
+            </h1>
 
-          {/* Divider Line: ───────────────────────────────── + */}
-          <div
-            ref={underlineRef}
-            className="w-full flex items-center gap-4 mb-8 opacity-0"
-          >
-            <div className="flex-1 h-[1px] bg-[#111111]/10 dark:bg-[#e5ded4]/10" />
-            <span className="text-[#966d3a] dark:text-[#d4b483] font-mono text-xs font-semibold">+</span>
-          </div>
-
-          {/* Updated Description */}
-          <div ref={descRef} className="mb-6 opacity-0">
-            <p className="text-[#111111]/80 dark:text-[#e5ded4]/80 font-normal text-base sm:text-lg leading-relaxed font-sans max-w-lg">
-              I build high-performance systems, <span className="text-[#966d3a] dark:text-[#d4b483] font-semibold">AI pipelines</span>, and infrastructure that power real products.
+            {/* 1.3 Short Introduction */}
+            <p className="mt-4 font-sans text-[15px] sm:text-[16px] text-[#222222] dark:text-[#E2E2E2] leading-[1.6] max-w-[34ch]">
+              I build backend services and AI applications, and contribute to open source.
             </p>
-          </div>
 
-          {/* CTA Buttons */}
-          <div ref={ctaRef} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mb-8 opacity-0 w-full sm:w-auto">
-            <MagneticButton
-              onClick={() => scrollToSection('skills')}
-              data-cursor-label="Explore"
-              className="cta-button px-8 py-4 bg-[#111111] hover:bg-[#222222] dark:bg-[#e5ded4] dark:hover:bg-[#fcfaf7] text-[#f5efe8] dark:text-[#111111] rounded-full text-xs font-mono font-semibold tracking-wide flex items-center justify-center gap-2 group"
-              aria-label="View selected work"
-            >
-              <span>View Selected Work</span>
-              <ArrowRight size={13} className="group-hover:translate-x-1.5 transition-transform duration-300" />
-            </MagneticButton>
-
-            <a
-              href={resume.pdfPath}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="cta-button-outline px-6 py-4 border-2 border-[#111111] dark:border-[#e5ded4]/30 hover:bg-[#111111] hover:text-[#f5efe8] dark:hover:bg-[#e5ded4] dark:hover:text-[#111111] text-[#111111] dark:text-[#e5ded4] rounded-full text-xs font-mono font-semibold tracking-wide flex items-center justify-center gap-2"
-            >
-              <Download size={12} />
-              <span>Resume</span>
-            </a>
-
-            <MagneticButton
-              onClick={() => scrollToSection('connect')}
-              data-cursor-label="Connect"
-              className="cta-button-outline px-6 py-4 border-2 border-[#111111] dark:border-[#e5ded4]/30 hover:bg-[#111111] hover:text-[#f5efe8] dark:hover:bg-[#e5ded4] dark:hover:text-[#111111] text-[#111111] dark:text-[#e5ded4] rounded-full text-xs font-mono font-semibold tracking-wide flex items-center justify-center gap-2"
-              aria-label="Let's talk"
-            >
-              <Mail size={12} />
-              <span>Let&apos;s Talk</span>
-            </MagneticButton>
-          </div>
-
-          {/* End of Left Column Content */}
-        </div>
-
-        {/* ── Right column: photo, metadata & tech stack ── */}
-        <div className="flex flex-col items-center w-full md:w-auto flex-shrink-0 order-1 md:order-2 md:-mt-16 gap-6 select-none">
-          <HeroAvatar ref={photoRef} />
-
-          {/* Metadata Card */}
-          <div
-            ref={metadataRef}
-            className="w-full max-w-[320px] opacity-0 mt-2 border border-[#111111]/5 dark:border-[#e5ded4]/8 bg-[#fcfaf7]/30 dark:bg-[#1e1b19]/30 backdrop-blur-md p-4 rounded-[1.75rem] shadow-sm space-y-3.5 hover:border-[#966d3a]/20 dark:hover:border-[#d4b483]/20 transition-all duration-300"
-          >
-            {/* Education Row */}
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full border border-[#111111]/5 dark:border-[#e5ded4]/8 bg-[#fcfaf7] dark:bg-[#111111] flex items-center justify-center text-[#966d3a] dark:text-[#d4b483] shadow-sm flex-shrink-0">
-                <GraduationCap size={14} className="stroke-[1.5]" />
+            {/* 1.4 Education and Internship */}
+            <div className="flex flex-col gap-2.5 font-mono text-xs sm:text-[13px] text-[#444444] dark:text-[#CCCCCC] mt-5 sm:mt-6">
+              {/* Education */}
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-[#FF5C35] shrink-0" aria-hidden="true" />
+                <span className="font-semibold text-[#121212] dark:text-[#FAF7F0]">IIT Hyderabad</span>
+                <span className="text-[#888888] dark:text-[#666666]">·</span>
+                <span>B.Tech ’26</span>
               </div>
-              <div className="flex flex-col">
-                <span className="font-sans font-semibold text-xs text-[#111111] dark:text-[#e5ded4]">Software Engineer</span>
-                <span className="font-sans text-[10px] text-[#555555] dark:text-[#cccccc]">IIT Hyderabad &apos;26</span>
+
+              {/* Internship on two clean lines */}
+              <div className="flex items-start gap-2">
+                <span className="w-1.5 h-1.5 bg-[#FF5C35] shrink-0 mt-1" aria-hidden="true" />
+                <div className="flex flex-col">
+                  <span className="font-semibold text-[#121212] dark:text-[#FAF7F0]">People Tech Group</span>
+                  <span className="text-[#666666] dark:text-[#A3A3A3] text-[11px] sm:text-xs">Former Software Developer Intern</span>
+                </div>
               </div>
             </div>
 
-            {/* Divider */}
-            <div className="h-[1px] bg-[#111111]/5 dark:bg-[#e5ded4]/8" />
+            {/* 1.5 Location */}
+            <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-[#666666] dark:text-[#999999] pt-1 mt-1">
+              <span className="w-1.5 h-1.5 bg-[#FF5C35] shrink-0" aria-hidden="true" />
+              <span>Rewari, Haryana, India</span>
+            </div>
+          </div>
 
-            {/* Location & Availability Row */}
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full border border-[#111111]/5 dark:border-[#e5ded4]/8 bg-[#fcfaf7] dark:bg-[#111111] flex items-center justify-center text-[#966d3a] dark:text-[#d4b483] shadow-sm flex-shrink-0 mt-0.5">
-                <MapPin size={14} className="stroke-[1.5]" />
+          {/* ======================================================== */}
+          {/* COLUMN 2: CENTRE                                          */}
+          {/* Clean Portrait with elastic drag                          */}
+          {/* ======================================================== */}
+          <div className="w-full flex flex-col justify-center items-center py-2 sm:py-4 select-none shrink-0">
+            {/* Stationary Wrapper */}
+            <div
+              ref={heroVisualRef}
+              className="relative w-[200px] sm:w-[230px] lg:w-[260px] xl:w-[280px] aspect-square flex items-center justify-center shrink-0"
+            >
+              {/* Draggable Moving Group */}
+              <div
+                ref={draggableRef}
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={release}
+                onPointerCancel={release}
+                onLostPointerCapture={release}
+                tabIndex={prefersReduced ? -1 : 0}
+                role="img"
+                aria-label="Portrait of Mukul Kumar, Software Engineer. Elastic draggable interaction."
+                style={{ touchAction: 'pan-y', transformOrigin: '50% -20px' }}
+                className={`relative w-full h-full flex items-center justify-center shrink-0 select-none overflow-visible focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5C35] ${
+                  prefersReduced ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'
+                }`}
+              >
+                {/* Photo Layer: Sharp, circular, clean brutalist border & shadow */}
+                <div className="relative w-full h-full rounded-full overflow-hidden flex items-center justify-center shrink-0 bg-[#FF5C35] z-10 border-2.5 border-[#121212] dark:border-[#FAF7F0] shadow-[4px_4px_0px_0px_#121212] dark:shadow-[4px_4px_0px_0px_#000000]">
+                  <Image
+                    src="/mukul-hero-circle.webp"
+                    alt="Portrait of Mukul Kumar, Software Engineer"
+                    width={320}
+                    height={320}
+                    priority
+                    draggable={false}
+                    className="w-full h-full object-cover select-none pointer-events-none"
+                  />
+                </div>
               </div>
-              <div className="flex flex-col items-start">
-                <span className="font-sans font-semibold text-xs text-[#111111] dark:text-[#e5ded4]">
-                  Based in India
-                  <span className="font-serif italic text-[10px] text-[#966d3a] dark:text-[#d4b483] ml-1.5 font-normal">Open for work</span>
-                </span>
-                <button
-                  onClick={handleCopyEmail}
-                  className="group/email flex items-center gap-1.5 mt-0.5 focus:outline-none focus-visible:ring-1 focus-visible:ring-[#966d3a] rounded px-1 -mx-1"
-                  title="Copy email to clipboard"
-                  aria-label="Copy email address"
+
+              {/* Playful Drag Hint: Speech label beneath portrait */}
+              <div
+                ref={hintRef}
+                aria-hidden="true"
+                className={`absolute -bottom-7 sm:-bottom-8 left-1/2 -translate-x-1/2 z-20 pointer-events-none inline-flex items-center gap-1.5 border border-[#121212] dark:border-[#FAF7F0] bg-[#FAF7F0] dark:bg-[#1C1C1C] px-2.5 py-1 font-mono text-xs sm:text-[13px] font-bold tracking-tight text-[#121212] dark:text-[#FAF7F0] shadow-[2px_2px_0px_0px_#121212] dark:shadow-[2px_2px_0px_0px_#000000] select-none whitespace-nowrap transition-opacity duration-300 ${
+                  prefersReduced ? 'hidden' : 'opacity-100'
+                }`}
+              >
+                <div
+                  aria-hidden="true"
+                  className="absolute -top-[5px] left-1/2 -translate-x-1/2 w-2 h-2 bg-[#FAF7F0] dark:bg-[#1C1C1C] border-t border-l border-[#121212] dark:border-[#FAF7F0] rotate-45"
+                />
+                <span>don’t drag me 👀</span>
+              </div>
+            </div>
+          </div>
+
+          {/* ======================================================== */}
+          {/* COLUMN 3: RIGHT                                           */}
+          {/* Role -> Specialization -> CTA Buttons -> Budibase Link    */}
+          {/* ======================================================== */}
+          <div
+            ref={rightColRef}
+            className="flex flex-col items-start lg:items-end justify-center lg:text-right min-w-0"
+          >
+            {/* 3.1 Role Heading (H2) */}
+            <h2 className="font-heading font-black text-[clamp(2rem,3.4vw,3.25rem)] tracking-tight uppercase leading-[0.92] text-[#121212] dark:text-[#FAF7F0]">
+              <span className="block">SOFTWARE</span>
+              <span className="block">ENGINEER</span>
+            </h2>
+
+            {/* 3.2 Specialization */}
+            <p className="mt-2.5 font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-[#FF5C35] dark:text-[#FF5C35] leading-snug">
+              Backend development &amp; AI applications
+            </p>
+
+            {/* 3.3 CTA Buttons */}
+            <div className="mt-5 sm:mt-6 flex flex-wrap items-center lg:justify-end gap-3 w-full sm:w-auto">
+              <button
+                onClick={() => navigateWithTransition('work')}
+                className="h-11 sm:h-12 px-5 sm:px-6 inline-flex items-center justify-center gap-2 bg-[#FF5C35] text-[#FAF7F0] font-mono text-xs sm:text-sm font-bold uppercase tracking-wider cursor-pointer border-2 border-[#121212] dark:border-[#FAF7F0] shadow-[3px_3px_0px_0px_#121212] dark:shadow-[3px_3px_0px_0px_#000000] hover:translate-x-[-1.5px] hover:translate-y-[-1.5px] hover:shadow-[5px_5px_0px_0px_#121212] dark:hover:shadow-[5px_5px_0px_0px_#000000] active:translate-x-0 active:translate-y-0 transition-all shrink-0"
+              >
+                <span>View Projects</span>
+                <ArrowUpRight size={16} className="stroke-[2.5]" />
+              </button>
+
+              {/* Resume Button Group: Opens in new tab without downloading + in-page preview */}
+              <div className="inline-flex items-stretch shadow-[3px_3px_0px_0px_#121212] dark:shadow-[3px_3px_0px_0px_#000000] hover:shadow-[5px_5px_0px_0px_#121212] dark:hover:shadow-[5px_5px_0px_0px_#000000] transition-all shrink-0">
+                <a
+                  href={resume.pdfPath}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="h-11 sm:h-12 px-4 sm:px-5 inline-flex items-center justify-center gap-2 bg-[#FAF7F0] dark:bg-[#1C1C1C] text-[#121212] dark:text-[#FAF7F0] font-mono text-xs sm:text-sm font-bold uppercase tracking-wider border-2 border-[#121212] dark:border-[#FAF7F0] hover:bg-[#FACC15] dark:hover:bg-[#FACC15] dark:hover:text-[#121212] transition-colors"
+                  title="Open resume PDF directly in new tab"
                 >
-                  <span className={`font-sans text-[9px] tracking-wide transition-all duration-300 font-medium ${
-                    copied ? 'text-emerald-600 dark:text-emerald-400 font-bold scale-102' : 'text-[#555555] dark:text-[#cccccc] group-hover/email:text-[#966d3a] dark:group-hover/email:text-[#d4b483]'
-                  }`}>
-                    {copied ? 'Email Copied! ✓' : 'mukulburoli@gmail.com'}
-                  </span>
+                  <FileText size={16} className="stroke-[2]" />
+                  <span>Resume</span>
+                  <ArrowUpRight size={14} className="stroke-[2.5] opacity-80" />
+                </a>
+
+                <button
+                  type="button"
+                  onClick={openResumeDialog}
+                  className="h-11 sm:h-12 px-3 inline-flex items-center justify-center gap-1 bg-[#FAF7F0] dark:bg-[#1C1C1C] text-[#121212] dark:text-[#FAF7F0] font-mono text-xs font-bold uppercase border-y-2 border-r-2 border-[#121212] dark:border-[#FAF7F0] hover:bg-[#FF5C35] hover:text-[#FAF7F0] dark:hover:bg-[#FF5C35] dark:hover:text-[#FAF7F0] transition-colors cursor-pointer"
+                  title="Quick in-page preview modal"
+                  aria-label="Preview resume in modal"
+                >
+                  <Eye size={15} />
+                  <span className="hidden sm:inline text-[11px]">Preview</span>
                 </button>
               </div>
             </div>
+
+            {/* 3.4 Budibase Contribution Link */}
+            <div className="mt-4 sm:mt-5">
+              <a
+                href="https://github.com/Budibase/budibase/pull/19667"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-[#555555] dark:text-[#A3A3A3] hover:text-[#FF5C35] dark:hover:text-[#FF5C35] transition-colors focus-visible:outline-none"
+              >
+                <span className="w-1.5 h-1.5 bg-[#FF5C35] rounded-none shrink-0 group-hover:scale-125 transition-transform" />
+                <span className="underline underline-offset-4 decoration-[#121212]/30 dark:decoration-[#FAF7F0]/30 group-hover:decoration-[#FF5C35]">
+                  Budibase — merged contribution
+                </span>
+                <ArrowUpRight size={13} className="shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </a>
+            </div>
           </div>
 
-          {/* Tech Stack Marquee */}
-          <div ref={techRef} className="w-full max-w-[320px] opacity-0">
-            <TechMarquee />
-          </div>
         </div>
-      </div>
-
-      {/* Scroll indicator */}
-      <div
-        ref={scrollRef}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 text-[#6b6b6b] select-none pointer-events-none opacity-0 z-10"
-        aria-hidden="true"
-      >
-        <span className="text-[8px] font-mono uppercase tracking-[0.25em]">Scroll</span>
-        <ChevronDown size={14} className="animate-bounce" />
       </div>
     </section>
   )

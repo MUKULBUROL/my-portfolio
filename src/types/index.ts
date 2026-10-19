@@ -1,6 +1,5 @@
 // ============================================================
-// AI Engineer OS — Centralized Type Definitions
-// All content models live here. Update data/ files only.
+// AI Engineer & Software Engineer OS — Centralized Type Definitions
 // ============================================================
 
 export interface Profile {
@@ -18,7 +17,7 @@ export interface Profile {
 export interface SocialLink {
   label: string
   url: string
-  icon: string // lucide icon name
+  icon: string
   username?: string
 }
 
@@ -31,6 +30,7 @@ export interface ResumeData {
 export interface ProjectItem {
   id: string
   name: string
+  category: 'Backend' | 'AI' | 'Systems'
   tagline: string
   description: string
   problem: string
@@ -38,6 +38,7 @@ export interface ProjectItem {
   architecture: string
   challenges: string
   results: string
+  highlights: string[]
   metrics?: string[]
   techStack: string[]
   tags: string[]
@@ -47,6 +48,8 @@ export interface ProjectItem {
   featured: boolean
   status: 'production' | 'archived' | 'experimental' | 'open-source'
   lessonsLearned: string
+  accentColor: string
+  experienceLink?: string
 }
 
 export interface SkillCategory {
@@ -62,4 +65,10 @@ export interface SkillItem {
   description?: string
 }
 
-
+export interface ParsedResumeInfo {
+  name?: string
+  email?: string
+  phone?: string
+  skills: string[]
+  fileName?: string
+}

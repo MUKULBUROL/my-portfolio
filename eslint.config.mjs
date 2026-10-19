@@ -13,6 +13,12 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "prisma/dist/**",
+    ".kilo/**",
+    ".claude/**",
+    ".agents/**",
+    ".archify/**",
+    ".archify-*/**",
+    "*.html",
   ]),
 ]);
 

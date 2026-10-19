@@ -43,6 +43,7 @@ export async function getProjectById(id: string): Promise<ProjectItem | null> {
         return {
           id: p.id,
           name: p.title,
+          category: (p.techStack.includes('Python') ? 'AI' : p.techStack.includes('C++') ? 'Systems' : 'Backend') as 'Backend' | 'AI' | 'Systems',
           tagline: p.description.slice(0, 80) + '...',
           description: p.description,
           problem: p.problem,
@@ -50,6 +51,7 @@ export async function getProjectById(id: string): Promise<ProjectItem | null> {
           architecture: p.architecture,
           challenges: p.challenges,
           results: p.results,
+          highlights: p.metrics ? [p.metrics] : [],
           metrics: p.metrics ? [p.metrics] : [],
           techStack: p.techStack,
           tags: p.techStack.slice(0, 3),
@@ -59,6 +61,7 @@ export async function getProjectById(id: string): Promise<ProjectItem | null> {
           featured: p.featured,
           status: 'production',
           lessonsLearned: '',
+          accentColor: '#FF5C35',
         }
       }
     } catch (err) {

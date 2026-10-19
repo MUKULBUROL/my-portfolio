@@ -14,6 +14,12 @@ export const socials: SocialLink[] = [
     username: 'Mukul Kumar',
   },
   {
+    label: 'LeetCode',
+    url: 'https://leetcode.com/u/mukul_kumar200/',
+    icon: 'Code',
+    username: '@mukul_kumar200',
+  },
+  {
     label: 'Email',
     url: 'mailto:mukulburoli@gmail.com',
     icon: 'Mail',

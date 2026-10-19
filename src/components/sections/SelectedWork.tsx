@@ -1,188 +1,260 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import React, { useState } from 'react'
+import Link from 'next/link'
 import { projects as staticProjects } from '@/data/projects'
-import { ArrowRight } from 'lucide-react'
 import type { ProjectItem } from '@/types'
-import { NotebookPage } from '../ui/NotebookPage'
+import { useUI } from '@/context/UIContext'
+import { BackendProofWidget } from '../ui/BackendProofWidget'
+import { ChevronDown, ChevronUp, ExternalLink, ArrowRight, Cpu, Layers } from 'lucide-react'
 
 interface SelectedWorkProps {
   initialProjects?: ProjectItem[]
 }
 
-/**
- * Book page-flip project showcase.
- */
+type FilterCategory = 'All' | 'Backend' | 'AI' | 'Systems'
+
 export function SelectedWork({ initialProjects }: SelectedWorkProps) {
-  const DISPLAY_PROJECTS = (initialProjects && initialProjects.length > 0)
-    ? initialProjects.slice(0, 3)
-    : staticProjects.slice(0, 3)
+  const { navigateWithTransition } = useUI()
+  const allProjects = initialProjects && initialProjects.length > 0 ? initialProjects : staticProjects
+  const [activeFilter, setActiveFilter] = useState<FilterCategory>('All')
+  const [expandedProjects, setExpandedProjects] = useState<Record<string, boolean>>({
+    'budibase-plugin-pruning': true, // open Budibase open-source contribution by default
+  })
 
-  const sectionRef   = useRef<HTMLDivElement>(null)
-  const bookRef      = useRef<HTMLDivElement>(null)
-  const pagesRef     = useRef<HTMLDivElement[]>([])
-
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger)
-
-    const section = sectionRef.current
-    const book    = bookRef.current
-    const pages   = pagesRef.current.filter(Boolean)
-
-    if (!section || !book || pages.length === 0) return
-
-    // Total scroll distance: 1 screen-height per page flip
-    const totalScrollLength = pages.length * window.innerHeight
-
-    // Master pinning timeline
-    const master = gsap.timeline({
-      scrollTrigger: {
-        trigger: section,
-        pin: true,
-        scrub: 1.2,
-        start: 'top top',
-        end: `+=${totalScrollLength}`,
-        invalidateOnRefresh: true,
-      },
-    })
-
-    // Animate each page flip in sequence
-    pages.forEach((page, i) => {
-      const progress = i / pages.length          // when this flip starts
-
-      master.fromTo(
-        page,
-        { rotateY: 0, z: i === 0 ? 0 : -1 },
-        {
-          rotateY: -180,
-          z: 2,
-          ease: 'power2.inOut',
-          transformOrigin: 'left center',
-        },
-        progress              // insert at this fraction through the timeline
-      )
-
-      // Shadow depth on page lift — gives 3D realism
-      master.fromTo(
-        page,
-        { filter: 'drop-shadow(0 0px 0px rgba(0,0,0,0))' },
-        {
-          filter: 'drop-shadow(-12px 8px 28px rgba(60,40,20,0.28))',
-          ease: 'power1.inOut',
-          yoyo: true,
-          repeat: 0,
-        },
-        progress
-      )
-    })
-
-    return () => {
-      master.scrollTrigger?.kill()
-      master.kill()
-    }
-  }, [])
-
-  const addPageRef = (el: HTMLDivElement | null, i: number) => {
-    if (el) pagesRef.current[i] = el
+  const toggleExpand = (id: string) => {
+    setExpandedProjects((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }))
   }
+
+  const filteredProjects = allProjects.filter((p) => {
+    if (activeFilter === 'All') return true
+    return p.category === activeFilter
+  })
+
+  const filterOptions: FilterCategory[] = ['All', 'Backend', 'AI', 'Systems']
 
   return (
     <section
-      id="selected-work"
-      ref={sectionRef}
-      className="relative w-full h-screen flex flex-col justify-center items-center overflow-hidden bg-transparent"
-      aria-label="Selected projects — book page flip"
+      id="work"
+      aria-label="Selected Engineering Work"
+      className="relative py-20 bg-[#FAF7F0] dark:bg-[#121212] border-t-3 border-[#121212] dark:border-[#FAF7F0] overflow-hidden"
     >
-      {/* Section label */}
-      <div className="absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-3 z-20 select-none">
-        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-muted">02</span>
-        <div className="w-16 h-px bg-border" />
-        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-muted">Selected Work</span>
-        <div className="w-16 h-px bg-border" />
-        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-muted hidden sm:inline">
-          Scroll to flip pages
-        </span>
-      </div>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        
+        {/* Section Header & Filters */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between border-b-2.5 border-[#121212] dark:border-[#FAF7F0] pb-6 mb-12 gap-6">
+          <div>
+            <div className="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-[#38BDF8] mb-2">
+              <span>WORK // PORTFOLIO</span>
+            </div>
+            <h2 className="font-heading font-black text-3xl sm:text-5xl uppercase tracking-tight text-[#121212] dark:text-[#FAF7F0]">
+              Built to do real work.
+            </h2>
+            <p className="font-mono text-xs sm:text-sm text-[#555555] dark:text-[#A3A3A3] mt-2">
+              Production backends, AI pipelines, and systems bridges with real architectural trade-offs.
+            </p>
+          </div>
 
-      {/* Section heading */}
-      <div className="absolute top-14 left-1/2 -translate-x-1/2 text-center z-20 select-none pointer-events-none">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-heading font-black tracking-tight text-primary">
-          Systems I&apos;ve Built
-        </h2>
-        <p className="mt-2 text-xs sm:text-sm text-muted font-sans max-w-md mx-auto">
-          High-performance backends, AI pipelines, and scalable architectures — from hackathons to production.
-        </p>
-      </div>
-
-      {/* ──── NOTEBOOK ──── */}
-      <div
-        ref={bookRef}
-        className="notebook notebook-container relative"
-      >
-        {/* Notebook shadow */}
-        <div
-          className="absolute inset-0 rounded-[4px] pointer-events-none notebook-shadow"
-          aria-hidden="true"
-        />
-
-        {/* Left SPINE strip */}
-        <div
-          className="absolute left-0 top-0 bottom-0 z-30 flex flex-col items-center justify-between py-4 notebook-spine"
-          aria-hidden="true"
-        >
-          {/* Spine rings */}
-          {Array.from({ length: 9 }).map((_, i) => (
-            <div
-              key={i}
-              className="notebook-ring"
-            />
-          ))}
-        </div>
-
-        {/* ── BACK COVER: GitHub CTA (visible after all flips) ── */}
-        <div
-          className="absolute inset-0 flex items-center justify-center rounded-[4px] notebook-back-cover"
-        >
-          <div className="flex flex-col items-center gap-6 px-8 text-center">
-            <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#8a7a60]">
-              End of Notebook
-            </span>
-            <h4 className="text-2xl sm:text-3xl md:text-4xl font-heading font-black tracking-tight leading-tight text-[#f5efe8] max-w-xs">
-              More work lives<br />on GitHub
-            </h4>
-            <a
-              href="https://github.com/MUKULBUROL"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-3 text-[#f5efe8] border-b border-[#8a7a60]/60 pb-1 text-sm font-mono font-bold tracking-wider hover:text-[#c4b080] transition-colors group"
-            >
-              <span>Explore Everything</span>
-              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-            </a>
+          {/* Filter Pills */}
+          <div className="flex flex-wrap gap-2" role="tablist" aria-label="Project category filters">
+            {filterOptions.map((filter) => {
+              const isActive = activeFilter === filter
+              return (
+                <button
+                  key={filter}
+                  onClick={() => setActiveFilter(filter)}
+                  role="tab"
+                  aria-selected={isActive}
+                  className={`brutal-btn px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider cursor-pointer ${
+                    isActive
+                      ? 'bg-[#121212] text-[#FAF7F0] dark:bg-[#FAF7F0] dark:text-[#121212]'
+                      : 'bg-[#FAF7F0] text-[#121212] dark:bg-[#1C1C1C] dark:text-[#FAF7F0]'
+                  }`}
+                >
+                  {filter}
+                </button>
+              )
+            })}
           </div>
         </div>
 
-        {/* ── PROJECT PAGES ── */}
-        {[...DISPLAY_PROJECTS].reverse().map((project, revIdx) => {
-          const idx = DISPLAY_PROJECTS.length - 1 - revIdx
-          return (
-            <NotebookPage
-              key={project.id}
-              project={project}
-              idx={idx}
-              totalCount={DISPLAY_PROJECTS.length}
-              addPageRef={addPageRef}
-            />
-          )
-        })}
-      </div>
+        {/* Project Cards List */}
+        <div className="flex flex-col gap-6">
+          {filteredProjects.map((project) => {
+            const isExpanded = !!expandedProjects[project.id]
+            const accentBg = project.accentColor || '#FF5C35'
 
-      {/* Scroll hint */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 text-muted select-none pointer-events-none z-20">
-        <span className="text-[8px] font-mono uppercase tracking-[0.25em]">Scroll to turn pages</span>
-        <div className="w-px h-6 bg-gradient-to-b from-muted to-transparent animate-pulse" />
+            return (
+              <article
+                key={project.id}
+                className="border-3 border-[#121212] dark:border-[#FAF7F0] bg-[#FAF7F0] dark:bg-[#181818] shadow-[6px_6px_0px_0px_#121212] dark:shadow-[6px_6px_0px_0px_#000000] transition-all"
+              >
+                {/* Card Header Bar (Clickable Toggle) */}
+                {/* Card Header Bar (Semantic Accessible Toggle Button) */}
+                <button
+                  type="button"
+                  onClick={() => toggleExpand(project.id)}
+                  aria-expanded={isExpanded}
+                  aria-controls={`project-content-${project.id}`}
+                  className="w-full p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left cursor-pointer hover:bg-[#121212]/5 dark:hover:bg-[#FAF7F0]/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5C35]"
+                >
+                  <div className="flex items-start sm:items-center gap-3.5">
+                    {/* Color Index Block */}
+                    <div
+                      className="w-10 h-10 border-2 border-[#121212] text-[#121212] font-mono font-black text-sm flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0px_0px_#121212]"
+                      style={{ backgroundColor: accentBg }}
+                    >
+                      <Layers size={18} />
+                    </div>
+
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
+                        <span className="font-mono text-[10px] font-bold uppercase px-2 py-0.5 border border-[#121212] bg-[#FAF7F0] dark:bg-[#202020] text-[#121212] dark:text-[#FAF7F0]">
+                          {project.category}
+                        </span>
+                        <span className="font-mono text-xs text-[#555555] dark:text-[#A3A3A3]">
+                          {project.techStack.join(' · ')}
+                        </span>
+                      </div>
+                      <h3 className="font-heading font-black text-xl sm:text-2xl uppercase tracking-tight text-[#121212] dark:text-[#FAF7F0]">
+                        {project.name}
+                      </h3>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 self-end sm:self-auto">
+                    <span className="font-mono text-xs font-bold uppercase text-[#555555] dark:text-[#A3A3A3] hidden sm:inline">
+                      {isExpanded ? 'Collapse' : 'Expand Details'}
+                    </span>
+                    <div className="w-8 h-8 border-2 border-[#121212] dark:border-[#FAF7F0] bg-[#FAF7F0] dark:bg-[#202020] text-[#121212] dark:text-[#FAF7F0] flex items-center justify-center shadow-[2px_2px_0px_0px_#121212]">
+                      {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    </div>
+                  </div>
+                </button>
+
+                {/* Collapsible Content Area */}
+                {isExpanded && (
+                  <div
+                    id={`project-content-${project.id}`}
+                    role="region"
+                    aria-label={`${project.name} details`}
+                    className="border-t-2.5 border-[#121212] dark:border-[#FAF7F0] p-6 sm:p-8 bg-[#FAF7F0]/90 dark:bg-[#1C1C1C]"
+                  >
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                      
+                      {/* Left Column: Description & Highlights (7 cols) */}
+                      <div className="lg:col-span-7 flex flex-col gap-5">
+                        <div>
+                          <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-[#555555] dark:text-[#A3A3A3] mb-2">
+                            Overview
+                          </h4>
+                          <p className="font-sans text-sm sm:text-base leading-relaxed text-[#121212] dark:text-[#FAF7F0] font-medium">
+                            {project.description}
+                          </p>
+                        </div>
+
+                        {/* Bullet Highlights */}
+                        {project.highlights && project.highlights.length > 0 && (
+                          <div className="border-2 border-[#121212] dark:border-[#FAF7F0]/30 bg-[#FAF7F0] dark:bg-[#222222] p-4 shadow-[3px_3px_0px_0px_#121212] dark:shadow-[3px_3px_0px_0px_#000000]">
+                            <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-[#121212] dark:text-[#FAF7F0] mb-3 flex items-center gap-1.5">
+                              <Cpu size={14} className="text-[#FF5C35]" />
+                              <span>Key Architectural Highlights</span>
+                            </h4>
+                            <ul className="flex flex-col gap-2 font-mono text-xs text-[#555555] dark:text-[#cccccc] list-none pl-0">
+                              {project.highlights.map((highlight, idx) => (
+                                <li key={idx} className="flex items-start gap-2">
+                                  <span className="text-[#FF5C35] font-black text-sm">↳</span>
+                                  <span>{highlight}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Right Column: Actions, Stack Badges & Links (5 cols) */}
+                      <div className="lg:col-span-5 flex flex-col gap-5">
+                        {/* Tech Stack List */}
+                        <div className="border-2 border-[#121212] dark:border-[#FAF7F0]/30 p-4 bg-[#FAF7F0] dark:bg-[#222222] shadow-[3px_3px_0px_0px_#121212] dark:shadow-[3px_3px_0px_0px_#000000]">
+                          <span className="font-mono text-xs font-bold uppercase text-[#555555] dark:text-[#A3A3A3] block mb-2">
+                            System Components
+                          </span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {project.techStack.map((tech) => (
+                              <span
+                                key={tech}
+                                className="font-mono text-xs font-bold bg-[#FACC15] text-[#121212] border-1.5 border-[#121212] px-2 py-0.5 shadow-[1.5px_1.5px_0px_0px_#121212]"
+                              >
+                                {tech}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Action Buttons & Links */}
+                        <div className="flex flex-col sm:flex-row lg:flex-col gap-2.5">
+                          <Link
+                            href={`/selected-work/${project.id}`}
+                            className="brutal-btn flex items-center justify-center gap-2 bg-[#FF5C35] text-[#FAF7F0] py-3 px-4 font-mono text-xs font-bold uppercase tracking-wider hover:brightness-105"
+                          >
+                            <span>Read Full Case Study</span>
+                            <ArrowRight size={14} />
+                          </Link>
+
+                          {project.githubUrl && (
+                            <a
+                              href={project.githubUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="brutal-btn flex items-center justify-center gap-2 bg-[#121212] text-[#FAF7F0] dark:bg-[#FAF7F0] dark:text-[#121212] py-3 px-4 font-mono text-xs font-bold uppercase tracking-wider"
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                              </svg>
+                              <span>View Source Code</span>
+                              <ExternalLink size={12} />
+                            </a>
+                          )}
+
+                          {project.liveUrl && (
+                            <a
+                              href={project.liveUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="brutal-btn flex items-center justify-center gap-2 bg-[#38BDF8] text-[#121212] py-3 px-4 font-mono text-xs font-bold uppercase tracking-wider"
+                            >
+                              <ExternalLink size={14} />
+                              <span>Live Deployment</span>
+                            </a>
+                          )}
+
+                          {/* Vehicle Signal Bridge link to Experience */}
+                          {project.experienceLink && (
+                            <button
+                              onClick={() => navigateWithTransition('experience')}
+                              className="brutal-btn flex items-center justify-center gap-2 bg-[#A3E635] text-[#121212] py-3 px-4 font-mono text-xs font-bold uppercase tracking-wider cursor-pointer"
+                            >
+                              <span>View Internship Experience</span>
+                              <ArrowRight size={14} />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                )}
+              </article>
+            )
+          })}
+        </div>
+
+
+        {/* Interactive Backend Proof Sandbox */}
+        <BackendProofWidget />
       </div>
     </section>
   )

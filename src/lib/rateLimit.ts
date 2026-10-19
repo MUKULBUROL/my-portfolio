@@ -31,16 +31,15 @@ export function rateLimit(
   windowMs: number = 60000
 ): { success: boolean; currentCount: number } {
   // Extract client IP address securely:
-  // 1. req.ip is populated securely by Next.js edge and Vercel runtime
-  // 2. Fall back to trusted proxy headers if present
-  const ip = (req as any).ip ||
-             req.headers.get('x-real-ip') ||
-             req.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
-             '127.0.0.1'
-  
+  // Fall back to trusted proxy headers if present
+  const ip =
+    req.headers.get('x-real-ip') ||
+    req.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+    '127.0.0.1'
+
   const now = Date.now()
   let record = ipCache.get(ip)
-  
+
   if (!record) {
     // Prevent memory exhaustion (DoS) by enforcing a maximum size on the cache Map
     if (ipCache.size >= MAX_CACHE_SIZE) {
@@ -52,14 +51,14 @@ export function rateLimit(
     record = { timestamps: [] }
     ipCache.set(ip, record)
   }
-  
+
   // Filter out timestamps outside the sliding window
   record.timestamps = record.timestamps.filter((t) => now - t < windowMs)
-  
+
   if (record.timestamps.length >= limit) {
     return { success: false, currentCount: record.timestamps.length }
   }
-  
+
   record.timestamps.push(now)
   return { success: true, currentCount: record.timestamps.length }
 }
