@@ -131,41 +131,13 @@ export function ResumeDialog() {
         {/* Content Area */}
         <div className="relative w-full flex-1 min-h-0 border-2 border-[#121212] dark:border-[#FAF7F0] bg-[#FFFFFF] dark:bg-[#111111] shadow-inner overflow-hidden flex flex-col">
           {activeTab === 'pdf' ? (
-            /* PDF Embed with Multi-tier Fallback */
-            <div className="relative w-full h-full flex-1">
-              <object
-                data={`${resume.pdfPath}#toolbar=1&navpanes=0&view=FitH`}
-                type="application/pdf"
-                className="w-full h-full block"
+            /* PDF Document Viewer */
+            <div className="relative w-full h-full flex-1 bg-[#525659]">
+              <iframe
+                src={`${resume.pdfPath}#toolbar=1&navpanes=0&view=FitH`}
+                className="w-full h-full block border-0"
                 title="Mukul Kumar Resume PDF Document"
-              >
-                <iframe
-                  src={`${resume.pdfPath}#toolbar=1&navpanes=0&view=FitH`}
-                  className="w-full h-full block border-0"
-                  title="Mukul Kumar Resume PDF Document"
-                >
-                  <div className="flex flex-col items-center justify-center h-full p-8 text-center font-mono bg-[#FAF7F0] dark:bg-[#181818]">
-                    <FileText size={48} className="text-[#FF5C35] mb-3" />
-                    <p className="text-base font-bold text-[#121212] dark:text-[#FAF7F0] mb-2">
-                      PDF Document Ready
-                    </p>
-                    <p className="text-xs text-[#666666] dark:text-[#AAAAAA] max-w-sm mb-5">
-                      Click below to view the official PDF in a separate tab or switch to the Quick Text tab above.
-                    </p>
-                    <div className="flex flex-wrap items-center justify-center gap-3">
-                      <a
-                        href={resume.pdfPath}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-4 py-2 bg-[#FF5C35] text-[#FAF7F0] font-mono text-xs font-bold uppercase tracking-wider inline-flex items-center gap-1.5 border-2 border-[#121212]"
-                      >
-                        <span>Open PDF in New Tab</span>
-                        <ArrowUpRight size={14} />
-                      </a>
-                    </div>
-                  </div>
-                </iframe>
-              </object>
+              />
             </div>
           ) : (
             /* Structured Clean Text View */
