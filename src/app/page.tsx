@@ -4,7 +4,6 @@ import { SelectedWork } from '@/components/sections/SelectedWork'
 import { Experience } from '@/components/sections/Experience'
 import { About } from '@/components/sections/About'
 import { Connect } from '@/components/sections/Connect'
-import { ResumeDialog } from '@/components/ui/ResumeDialog'
 import { prisma } from '@/lib/db'
 import type { ProjectItem } from '@/types'
 
@@ -70,8 +69,6 @@ export default async function HomePage() {
       {/* 06. Contact Section */}
       <Connect />
 
-      {/* Global Resume Modal Dialog */}
-      <ResumeDialog />
     </>
   )
 }

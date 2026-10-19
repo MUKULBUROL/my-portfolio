@@ -137,10 +137,11 @@ export function RealisticCurtain() {
       heading.focus({ preventScroll: true })
     }
 
-    // Reset underlying page scale to 1.0
+    // Clear underlying page transform so it does not trap fixed descendants
     if (main) {
-      main.style.transform = 'scale(1)'
-      main.style.transition = 'transform 0.3s ease-out'
+      main.style.transform = ''
+      main.style.transition = ''
+      main.style.transformOrigin = ''
     }
 
     restoreHeroElements()

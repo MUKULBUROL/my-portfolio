@@ -27,6 +27,7 @@ import { CustomCursor } from '@/components/ui/CustomCursor'
 import { ClickSoundListener } from '@/components/ui/ClickSoundListener'
 import { CompileTransition } from '@/components/ui/CompileTransition'
 import { RealisticCurtain } from '@/components/ui/RealisticCurtain'
+import { ResumeDialog } from '@/components/ui/ResumeDialog'
 import { profile } from '@/data/profile'
 import { ThemeProvider } from '@/context/ThemeContext'
 
@@ -172,6 +173,9 @@ export default function RootLayout({
 
             {/* Main Application Container */}
             <main id="main-content">{children}</main>
+
+            {/* Global Resume Modal Dialog */}
+            <ResumeDialog />
           </Providers>
         </ThemeProvider>
       </body>
